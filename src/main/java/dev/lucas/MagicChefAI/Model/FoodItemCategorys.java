@@ -4,6 +4,6 @@ public enum FoodItemCategorys {
     CARNES,
     VEGETAIS,
     FRUTAS,
-    LATICiONIOS,
+    LATICINIOS,
     GRAO,
 }
