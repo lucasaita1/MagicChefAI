@@ -17,6 +17,7 @@ public class FoodItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
+    @Enumerated(EnumType.STRING)
     private FoodItemCategorys categoria;
     private int quantidade;
     private LocalDate validade;
