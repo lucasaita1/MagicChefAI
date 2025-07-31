@@ -1,9 +1,13 @@
 package dev.lucas.MagicChefAI.Model;
 
 public enum FoodItemCategorys {
-    CARNES,
-    VEGETAIS,
-    FRUTAS,
-    LATICINIOS,
-    GRAO,
-}
+        GRAO,
+        CARNE,
+        LEGUME,
+        LATICINIO,
+        PADARIA,
+        PROTEINA,
+        VERDURA,
+        FRUTA,
+        MASSAS
+    }
