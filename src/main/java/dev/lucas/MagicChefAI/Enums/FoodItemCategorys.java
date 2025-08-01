@@ -1,4 +1,4 @@
-package dev.lucas.MagicChefAI.Model;
+package dev.lucas.MagicChefAI.Enums;
 
 public enum FoodItemCategorys {
         GRAO,

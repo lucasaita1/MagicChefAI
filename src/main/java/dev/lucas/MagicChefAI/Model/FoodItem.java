@@ -1,6 +1,7 @@
 package dev.lucas.MagicChefAI.Model;
 
 
+import dev.lucas.MagicChefAI.Enums.FoodItemCategorys;
 import jakarta.persistence.*;
 import lombok.*;
 
