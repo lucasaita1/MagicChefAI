@@ -1,6 +1,8 @@
 package dev.lucas.MagicChefAI.Service;
 
-import lombok.AllArgsConstructor;
+import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -12,13 +14,21 @@ import java.util.Map;
 
 
 @Service
-@AllArgsConstructor
 public class OpenAiService {
 
     private final WebClient webClient;
-    private String apiKey = System.getenv("API_KEY");
+    private final String apiKey;
 
+    @Autowired
+    public OpenAiService(WebClient.Builder webClientBuilder) {
+        Dotenv dotenv = Dotenv.load(); // <-- carrega o .env
+        this.apiKey = dotenv.get("API_KEY"); // <-- lê a chave
+        this.webClient = webClientBuilder.baseUrl("https://api.openai.com").build();
+    }
+
+    @PostConstruct
     public Mono<String> generationRecipe() {
+        //monta o promp
         String prompt = "Me sugira uma receita com ingredientes comuns nas geladeiras do Brasil.";
         Map<String, Object> requestBody = Map.of(
                 "model", "gpt-4o",
@@ -33,6 +43,8 @@ public class OpenAiService {
                         )
                 )
         );
+
+        //requisiçao do promp
         return webClient.post()
                 .uri("/v1/chat/completions")
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -41,7 +53,6 @@ public class OpenAiService {
                 .retrieve()
                 .bodyToMono(Map.class)
                 .map(response -> {
-                    // Extrai a lista de choices
                     List<Map<String, Object>> choices = (List<Map<String, Object>>) response.get("choices");
 
                     if (choices != null && !choices.isEmpty()) {
@@ -55,3 +66,12 @@ public class OpenAiService {
                 });
     }
 }
+ /*curl https://api.openai.com/v1/responses \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $OPENAI_API_KEY" \
+    -d '{
+        "model": "gpt-4.1",
+        "input": "Write a one-sentence bedtime story about a unicorn."
+    }'
+    /*
+     */
