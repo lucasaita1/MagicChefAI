@@ -1,5 +1,7 @@
 package dev.lucas.MagicChefAI.Enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum FoodItemCategorys {
         GRAO,
         CARNE,
@@ -10,6 +12,12 @@ public enum FoodItemCategorys {
         VERDURA,
         FRUTA,
         MASSAS,
-        GORDURAS,
-        BEBIDAS
+        DOCES,
+        BEBIDAS;
+
+        @JsonCreator
+        public static FoodItemCategorys fromString(String key) {
+                if (key == null) return null;
+                return FoodItemCategorys.valueOf(key.toUpperCase());
+        }
     }
