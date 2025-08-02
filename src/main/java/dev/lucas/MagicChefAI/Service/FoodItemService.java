@@ -46,4 +46,8 @@ public class FoodItemService {
         }
         return false;
     }
+
+    public void deleteall(){
+        repository.deleteAll();
+    }
 }
