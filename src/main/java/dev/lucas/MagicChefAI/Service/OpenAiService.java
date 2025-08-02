@@ -42,7 +42,7 @@ public class OpenAiService {
                 "messages", List.of(
                         Map.of(
                                 "role", "system",
-                                "content", "Me sugira uma receita com ingredientes comuns nas geladeiras do Brasil."
+                                "content", "Baseado nos itens cadastrados no banco de dados, faça uma receita gostosa. (Pode usar mais items e dicas para compor a receita)\n" + alimentos
                         ),
                         Map.of(
                                 "role", "user",
