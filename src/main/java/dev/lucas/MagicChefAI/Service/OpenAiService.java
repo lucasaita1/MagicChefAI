@@ -1,5 +1,6 @@
 package dev.lucas.MagicChefAI.Service;
 
+import dev.lucas.MagicChefAI.Model.FoodItem;
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -26,10 +28,15 @@ public class OpenAiService {
         this.webClient = webClientBuilder.baseUrl("https://api.openai.com").build();
     }
 
-    @PostConstruct
-    public Mono<String> generationRecipe() {
+
+    public Mono<String> generationRecipe(List<FoodItem> foodItems) {
+
+        String alimentos = foodItems.stream()
+                .map(item -> String.format("gs (%s) - Quantidade: %d, Categoria: %s",
+                        item.getNome(), item.getQuantidade(), item.getCategoria()))
+                .collect(Collectors.joining("\n"));
         //monta o promp
-        String prompt = "Me sugira uma receita com ingredientes comuns nas geladeiras do Brasil.";
+        String prompt = "Baseado nos itens cadastrados no banco de dados, faça uma receita gostosa. (Pode usar mais items e dicas para compor a receita)\n " + alimentos ;
         Map<String, Object> requestBody = Map.of(
                 "model", "gpt-4o",
                 "messages", List.of(
