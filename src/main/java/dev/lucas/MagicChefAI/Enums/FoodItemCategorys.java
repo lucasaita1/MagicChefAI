@@ -9,5 +9,7 @@ public enum FoodItemCategorys {
         PROTEINA,
         VERDURA,
         FRUTA,
-        MASSAS
+        MASSAS,
+        GORDURAS,
+        BEBIDAS
     }
