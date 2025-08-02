@@ -13,9 +13,12 @@ public class RecipeController {
 
     private final OpenAiService openAiService;
 
-    @GetMapping
+    @GetMapping("/generate")
     public Mono<ResponseEntity<String>> generationRecipe(){
-        return openAiService.generationRecipe();
+        return openAiService.generationRecipe()
+                .map(recipe -> ResponseEntity.ok(recipe))
+                .defaultIfEmpty(ResponseEntity.noContent().build());
+
     }
 
 }
