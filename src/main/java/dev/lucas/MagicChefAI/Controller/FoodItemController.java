@@ -48,5 +48,11 @@ public class FoodItemController {
         foodItemService.deletarItem(id);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/deletar/todos")
+    public ResponseEntity<Void> deletandoTudo(){
+        foodItemService.deleteall();
+        return ResponseEntity.noContent().build();
+    }
 }
 
