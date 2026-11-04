@@ -1,0 +1,74 @@
+spring:
+  application:
+    name: MagicChefAI
+  config:
+    # Reads KEY=value pairs from a local .env (backend folder or repository root). Never committed.
+    import: optional:file:.env[.properties],optional:file:../.env[.properties]
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/magic_chef_ai}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Flyway owns the schema; Hibernate only checks that the entities match it
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      chat:
+        options:
+          model: ${OPENAI_MODEL:gpt-4o-mini}
+          temperature: 0.7
+
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: framework
+  error:
+    include-message: never
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+magicchef:
+  version: @project.version@
+  security:
+    jwt:
+      secret: ${JWT_SECRET:}
+      issuer: magicchef-ai
+      ttl: ${JWT_TTL:2h}
+    cookie:
+      name: mc_fgp
+      secure: ${COOKIE_SECURE:true}
+      same-site: ${COOKIE_SAME_SITE:Strict}
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+    login-attempts-per-minute: ${LOGIN_RATE_LIMIT:10}
+  ai:
+    requests-per-minute: ${AI_RATE_LIMIT:5}
+    max-input-length: 500
+    max-pantry-items: 30
+
+logging:
+  level:
+    dev.lucas.magicchef: INFO
