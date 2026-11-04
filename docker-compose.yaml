@@ -8,7 +8,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-magic_chef_ai}
     ports:
-      - "5432:5432"
+      # 5433 on the host avoids clashing with a locally installed Postgres
+      - "5433:5432"
     volumes:
       # Postgres 16 cannot read data files created by Postgres 14, so it gets a fresh volume
       - postgres16-data:/var/lib/postgresql/data
