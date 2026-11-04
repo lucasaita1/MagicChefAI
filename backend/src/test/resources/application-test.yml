@@ -1,0 +1,21 @@
+spring:
+  config:
+    import: ""
+  datasource:
+    url: jdbc:h2:mem:magicchef;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password: ""
+  ai:
+    openai:
+      # Dummy key: the real OpenAI call is always replaced by a mock in tests
+      api-key: test-key
+
+magicchef:
+  security:
+    jwt:
+      secret: test-secret-with-at-least-thirty-two-bytes!!
+      ttl: 30m
+    cookie:
+      secure: false
+  ai:
+    requests-per-minute: 3
