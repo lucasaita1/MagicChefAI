@@ -12,7 +12,7 @@
 ![Postgres](https://img.shields.io/badge/Postgres-18-336791)
 ![Railway](https://img.shields.io/badge/deploy-Railway-0B0D0E)
 
-🌐 **Produção:** _a definir após o deploy_ · 🎬 **Vídeo:** _a definir_
+🌐 **Produção:** [web-production-dc4259.up.railway.app](https://web-production-dc4259.up.railway.app) · 🎬 **Vídeo:** _a definir_
 
 </div>
 
