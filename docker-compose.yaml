@@ -3,7 +3,7 @@
 #   web (public, :8088)  ->  api (private)  ->  db (private)
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     container_name: postgres_magicchef
     restart: unless-stopped
     environment:
@@ -14,8 +14,9 @@ services:
       # 5433 on the host avoids clashing with a locally installed Postgres
       - "5433:5432"
     volumes:
-      # Postgres 16 cannot read data files created by Postgres 14, so it gets a fresh volume
-      - postgres16-data:/var/lib/postgresql/data
+      # Postgres 18 images keep data in a versioned subfolder, so the volume mounts the parent
+      # (and a new major version always starts from a fresh volume)
+      - postgres18-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -56,4 +57,4 @@ services:
       - "8088:80"
 
 volumes:
-  postgres16-data:
+  postgres18-data:
