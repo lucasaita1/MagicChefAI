@@ -1,3 +1,6 @@
+# Local development: `docker compose up -d` starts only Postgres.
+# Production-like stack (same topology as Railway): `docker compose --profile full up --build`
+#   web (public, :8088)  ->  api (private)  ->  db (private)
 services:
   db:
     image: postgres:16-alpine
@@ -18,6 +21,39 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+  api:
+    profiles: ["full"]
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-magic_chef_ai}
+      DATABASE_USERNAME: ${POSTGRES_USER:-postgres}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      MAIL_FROM: ${MAIL_FROM:-MagicChefAI <onboarding@resend.dev>}
+      APP_BASE_URL: http://localhost:8088
+      # The browser sends Origin: http://localhost:8088 through the gateway
+      CORS_ALLOWED_ORIGINS: http://localhost:8088
+      CLIENT_IP_HEADER: X-Real-IP
+      COOKIE_SECURE: "false"
+    # No ports: like on Railway, the API is only reachable through the gateway
+
+  web:
+    profiles: ["full"]
+    build: ./frontend
+    depends_on:
+      - api
+    environment:
+      API_UPSTREAM: http://api:8080
+    ports:
+      - "8088:80"
 
 volumes:
   postgres16-data:
