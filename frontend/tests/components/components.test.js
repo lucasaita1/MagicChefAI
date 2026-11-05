@@ -19,6 +19,16 @@ describe('RobotChef', () => {
     expect(wrapper.attributes('width')).toBe('100')
   })
 
+  it('follows the gaze within limits and covers its eyes when shy', () => {
+    const looking = mount(RobotChef, { props: { lookX: 5, lookY: -0.5 } })
+    expect(looking.find('.eyes').attributes('style')).toContain('translate(7px, -2px)')
+
+    const shy = mount(RobotChef, { props: { mood: 'shy' } })
+    expect(shy.classes()).toContain('is-shy')
+    expect(shy.findAll('.eye')).toHaveLength(0)
+    expect(shy.findAll('.cover')).toHaveLength(2)
+  })
+
   it('shows smiling eyes when happy', () => {
     expect(mount(RobotChef, { props: { mood: 'happy' } }).findAll('.eye')).toHaveLength(0)
     expect(mount(RobotChef).findAll('.eye')).toHaveLength(2)
@@ -26,8 +36,14 @@ describe('RobotChef', () => {
 })
 
 describe('AppIcon', () => {
-  it.each(['book', 'fridge', 'sparkles', 'logout', 'chevron-down'])('renders %s', (name) => {
-    expect(mount(AppIcon, { props: { name } }).find('path, rect').exists()).toBe(true)
+  it.each(['book', 'fridge', 'eye', 'eye-off', 'heart', 'carrot', 'cheese', 'snowflake'])('renders %s', (name) => {
+    expect(mount(AppIcon, { props: { name } }).find('path, rect, circle').exists()).toBe(true)
+  })
+
+  it('falls back to a neutral icon and supports filled style', () => {
+    const wrapper = mount(AppIcon, { props: { name: 'unknown', filled: true } })
+    expect(wrapper.find('path').exists()).toBe(true)
+    expect(wrapper.attributes('fill')).toBe('currentColor')
   })
 })
 

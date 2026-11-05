@@ -85,6 +85,24 @@ describe('LoginView', () => {
     expect(router.currentRoute.value.name).toBe('recipes')
   })
 
+  it('makes the robot watch the typing and cover its eyes when the password is revealed', async () => {
+    const { wrapper } = await mountView(LoginView, '/login')
+    const robot = () => wrapper.find('.hero-bot')
+
+    await wrapper.find('#email').trigger('focus')
+    await wrapper.find('#email').setValue('lucas@mail.com')
+    expect(robot().classes()).toContain('is-idle')
+    expect(robot().find('.eyes').attributes('style')).toMatch(/translate\((?!0px, 0px)/)
+
+    await wrapper.find('#email').trigger('blur')
+    await wrapper.find('#password').setValue('segredo123')
+    await wrapper.find('[aria-label="Mostrar senha"]').trigger('click')
+    expect(robot().classes()).toContain('is-shy')
+
+    await wrapper.find('[aria-label="Ocultar senha"]').trigger('click')
+    expect(robot().classes()).not.toContain('is-shy')
+  })
+
   it('shows API errors and the expired session notice', async () => {
     api.login.mockRejectedValue(Object.assign(new Error('E-mail ou senha inválidos.'), { fieldErrors: { email: 'E-mail inválido' } }))
     const { wrapper } = await mountView(LoginView, '/login?expired=1')
