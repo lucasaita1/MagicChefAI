@@ -1,12 +1,13 @@
-# Rendered by the nginx image entrypoint (envsubst): PORT, API_UPSTREAM and
+# Rendered by the nginx image entrypoint (envsubst): PORT, API_UPSTREAM, CLIENT_IP_VAR and
 # NGINX_LOCAL_RESOLVERS come from the environment; nginx variables are left untouched.
-# API_UPSTREAM is validated first by 05-normalize-upstream.envsh.
+# API_UPSTREAM and CLIENT_IP_VAR are prepared by 05-normalize-upstream.envsh.
 
-# Real client IP = last hop appended to X-Forwarded-For by the platform edge (cannot be
-# forged by the client, who can only prepend values). Falls back to the socket address.
-map $http_x_forwarded_for $client_ip {
-    "~(?<last_hop>[^,\s]+)\s*$" $last_hop;
-    default                     $remote_addr;
+# Real client IP. On Railway the edge overwrites X-Real-IP with the true client address
+# (values sent by the client are discarded), so it is trusted when CLIENT_IP_SOURCE=edge.
+# Without an edge in front (local Docker), the socket address is used instead.
+map $http_x_real_ip $edge_client_ip {
+    ""      $remote_addr;
+    default $http_x_real_ip;
 }
 
 server {
@@ -27,12 +28,6 @@ server {
     set $api_upstream ${API_UPSTREAM};
 
     include /etc/nginx/snippets/security-headers.conf;
-
-    # TEMPORARY: inspect which client-IP headers the platform edge sets (removed after use)
-    location = /__ipdebug {
-        default_type text/plain;
-        return 200 "remote=$remote_addr\nxff=$http_x_forwarded_for\nx_real_ip=$http_x_real_ip\nx_envoy_external=$http_x_envoy_external_address\ncf=$http_cf_connecting_ip\ntrue_client=$http_true_client_ip\nfastly=$http_fastly_client_ip\nforwarded=$http_forwarded\nx_client_ip=$http_x_client_ip\nx_railway_request_id=$http_x_railway_request_id\n";
-    }
 
     location = /healthz {
         access_log off;
@@ -57,8 +52,8 @@ server {
         proxy_pass $api_upstream;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $client_ip;
-        proxy_set_header X-Forwarded-For $client_ip;
+        proxy_set_header X-Real-IP ${CLIENT_IP_VAR};
+        proxy_set_header X-Forwarded-For ${CLIENT_IP_VAR};
         proxy_set_header X-Forwarded-Proto https;
         proxy_read_timeout 90s;
     }

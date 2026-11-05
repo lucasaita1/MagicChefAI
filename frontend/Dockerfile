@@ -10,6 +10,7 @@ RUN npm run build
 FROM nginx:1.29-alpine
 ENV PORT=80 \
     API_UPSTREAM=http://api:8080 \
+    CLIENT_IP_SOURCE=edge \
     NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
 COPY --chmod=755 nginx/05-normalize-upstream.envsh /docker-entrypoint.d/05-normalize-upstream.envsh
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template

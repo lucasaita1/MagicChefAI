@@ -13,3 +13,13 @@ fi
 
 export API_UPSTREAM="$clean"
 echo "API gateway upstream: $API_UPSTREAM"
+
+# Which address identifies the client for the API's rate limits:
+#   edge   -> X-Real-IP written by the platform edge (Railway), falling back to the socket
+#   socket -> TCP peer address (no trusted proxy in front, e.g. local Docker)
+case "${CLIENT_IP_SOURCE:-edge}" in
+    edge) export CLIENT_IP_VAR='$edge_client_ip' ;;
+    socket) export CLIENT_IP_VAR='$remote_addr' ;;
+    *) echo "CLIENT_IP_SOURCE must be 'edge' or 'socket' (received: '$CLIENT_IP_SOURCE')" >&2; exit 1 ;;
+esac
+echo "Client IP source: ${CLIENT_IP_SOURCE:-edge}"
