@@ -5,5 +5,5 @@ import java.util.UUID;
 /**
  * Principal stored in the security context after a JWT passes every check.
  */
-public record AuthenticatedUser(Long id, String name, String email, UUID sessionId) {
+public record AuthenticatedUser(Long id, String name, String email, boolean emailVerified, UUID sessionId) {
 }
