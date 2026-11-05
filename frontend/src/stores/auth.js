@@ -22,6 +22,7 @@ export const useAuthStore = defineStore('auth', {
   },
   getters: {
     isAuthenticated: (state) => Boolean(state.token) && (!state.expiresAt || new Date(state.expiresAt) > new Date()),
+    isVerified: (state) => Boolean(state.user?.emailVerified),
     firstName: (state) => state.user?.name?.split(' ')[0] ?? ''
   },
   actions: {
@@ -38,11 +39,31 @@ export const useAuthStore = defineStore('auth', {
         this.clear()
       }
     },
+    /** Reloads the user, e.g. after the e-mail was confirmed in another tab. */
+    async refreshUser() {
+      if (!this.token) return
+      this.setUser(await api.me())
+    },
+    async verifyEmail(token) {
+      const verified = await api.verifyEmail(token)
+      if (this.user?.id === verified.id) this.setUser(verified)
+      return verified
+    },
+    resendVerification() {
+      return api.resendVerification()
+    },
+    setUser(user) {
+      this.user = user
+      this.save()
+    },
     persist({ token, user, expiresAt }) {
       this.token = token
       this.user = user
       this.expiresAt = expiresAt
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ token, user, expiresAt }))
+      this.save()
+    },
+    save() {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ token: this.token, user: this.user, expiresAt: this.expiresAt }))
     },
     clear() {
       this.token = null
