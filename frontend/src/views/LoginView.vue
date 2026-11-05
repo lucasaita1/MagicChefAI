@@ -3,8 +3,22 @@ import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import RobotChef from '@/components/RobotChef.vue'
+import AppIcon from '@/components/AppIcon.vue'
 
-const FLOATING = ['🍅', '🥕', '🧄', '🥚', '🧀', '🌶️', '🍋', '🥑', '🍄', '🥖']
+const FLOATING = [
+  { icon: 'chili', color: '#ff6b6b' },
+  { icon: 'carrot', color: '#ffa94d' },
+  { icon: 'garlic', color: '#e9e3ff' },
+  { icon: 'egg', color: '#ffe8a3' },
+  { icon: 'cheese', color: '#ffd43b' },
+  { icon: 'leaf', color: '#69db7c' },
+  { icon: 'apple', color: '#ff8787' },
+  { icon: 'mushroom', color: '#d0bfff' },
+  { icon: 'wheat', color: '#ffc078' },
+  { icon: 'bread', color: '#e8b07a' }
+]
+/** How many characters it takes for the robot's eyes to sweep across a field. */
+const GAZE_SPAN = 28
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -17,12 +31,27 @@ const loading = ref(false)
 const error = ref(route.query.expired ? 'Sua sessão expirou. Entre novamente.' : '')
 const fieldErrors = ref({})
 const shakeKey = ref(0)
+const focused = ref(null)
 
 const isRegister = computed(() => mode.value === 'register')
+const passwordVisible = computed(() => showPassword.value && form.password.length > 0)
 const robotMood = computed(() => {
   if (loading.value) return 'thinking'
+  // Polite robot: covers its eyes while the password is visible
+  if (passwordVisible.value) return 'shy'
   if (error.value) return 'confused'
+  if (focused.value) return 'idle'
   return isRegister.value ? 'happy' : 'wave'
+})
+
+/** Eyes follow the field being typed and sweep along the text as it grows. */
+const robotLook = computed(() => {
+  if (!focused.value || passwordVisible.value) return { x: 0, y: 0 }
+  const progress = Math.min(form[focused.value].length, GAZE_SPAN) / GAZE_SPAN
+  const stacked = typeof window !== 'undefined' && window.matchMedia?.('(max-width: 900px)').matches
+  if (stacked) return { x: -0.7 + progress * 1.4, y: 1 }
+  const row = { name: 0.15, email: 0.5, password: 0.9 }[focused.value]
+  return { x: 0.3 + progress * 0.7, y: row }
 })
 
 function switchMode(next) {
@@ -57,10 +86,12 @@ async function submit() {
   <main class="login">
     <section class="hero" aria-hidden="true">
       <div class="orbit">
-        <span v-for="(item, i) in FLOATING" :key="item" class="food" :style="{ '--i': i, '--n': FLOATING.length }"><span class="food-inner">{{ item }}</span></span>
+        <span v-for="(item, i) in FLOATING" :key="item.icon" class="food" :style="{ '--i': i, '--n': FLOATING.length }">
+          <span class="food-inner" :style="{ '--c': item.color }"><AppIcon :name="item.icon" :size="22" /></span>
+        </span>
       </div>
       <div class="halo" />
-      <RobotChef :mood="robotMood" :size="250" class="hero-bot" />
+      <RobotChef :mood="robotMood" :look-x="robotLook.x" :look-y="robotLook.y" :size="250" class="hero-bot" />
     </section>
 
     <section class="panel">
@@ -81,14 +112,14 @@ async function submit() {
           <Transition name="fade-up">
             <div v-if="isRegister" class="field">
               <label for="name">Como o Chef deve te chamar?</label>
-              <input id="name" v-model.trim="form.name" class="input" autocomplete="name" placeholder="Seu nome" maxlength="80" required />
+              <input id="name" v-model.trim="form.name" class="input" autocomplete="name" placeholder="Seu nome" maxlength="80" required @focus="focused = 'name'" @blur="focused = null" />
               <span v-if="fieldErrors.name" class="field-error">{{ fieldErrors.name }}</span>
             </div>
           </Transition>
 
           <div class="field">
             <label for="email">E-mail</label>
-            <input id="email" v-model.trim="form.email" class="input" type="email" autocomplete="email" placeholder="voce@email.com" required />
+            <input id="email" v-model.trim="form.email" class="input" type="email" autocomplete="email" placeholder="voce@email.com" required @focus="focused = 'email'" @blur="focused = null" />
             <span v-if="fieldErrors.email" class="field-error">{{ fieldErrors.email }}</span>
           </div>
 
@@ -104,9 +135,11 @@ async function submit() {
                 :placeholder="isRegister ? 'Mínimo 8 caracteres, letras e números' : '••••••••'"
                 maxlength="72"
                 required
+                @focus="focused = 'password'"
+                @blur="focused = null"
               />
               <button type="button" class="reveal" :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'" @click="showPassword = !showPassword">
-                {{ showPassword ? '🙈' : '👁️' }}
+                <AppIcon :name="showPassword ? 'eye-off' : 'eye'" :size="18" />
               </button>
             </div>
             <span v-if="fieldErrors.password" class="field-error">{{ fieldErrors.password }}</span>
@@ -122,7 +155,7 @@ async function submit() {
           </button>
         </form>
 
-        <p class="secure">🔒 Sessão protegida com JWT + cookie HttpOnly</p>
+        <p class="secure"><AppIcon name="lock" :size="13" /> Sessão protegida com JWT + cookie HttpOnly</p>
       </div>
     </section>
   </main>
@@ -174,9 +207,18 @@ async function submit() {
   transform: rotate(var(--angle)) translateX(220px) rotate(calc(-1 * var(--angle)));
   filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.4));
 }
-/* Counter-rotates so the emojis stay upright while the ring spins */
+/* Counter-rotates so the icons stay upright while the ring spins */
 .food-inner {
-  display: inline-block;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  color: var(--c);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 24px -6px var(--c), inset 0 0 12px -6px var(--c);
+  backdrop-filter: blur(6px);
   animation: orbit 40s linear infinite reverse;
 }
 
@@ -252,6 +294,10 @@ form {
   padding-right: 48px;
 }
 .reveal {
+  display: grid;
+  place-items: center;
+  color: var(--text-dim);
+  transition: color 0.2s, background 0.2s;
   position: absolute;
   right: 6px;
   top: 50%;
@@ -277,7 +323,15 @@ form {
   margin-top: 4px;
   font-size: 15.5px;
 }
+.reveal:hover {
+  color: var(--text);
+  background: var(--surface);
+}
 .secure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   margin: 16px 0 0;
   text-align: center;
   font-size: 12.5px;
@@ -305,8 +359,11 @@ form {
     width: 170px;
     height: 196px;
   }
+  .food-inner {
+    width: 36px;
+    height: 36px;
+  }
   .food {
-    font-size: 24px;
     transform: rotate(var(--angle)) translateX(140px) rotate(calc(-1 * var(--angle)));
   }
   .halo {
