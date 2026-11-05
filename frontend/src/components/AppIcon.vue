@@ -33,6 +33,10 @@ defineProps({
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <path d="m16 17 5-5-5-5M21 12H9" />
     </template>
+    <template v-else-if="name === 'mail'">
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path d="m3.5 6.5 8.5 6.5 8.5-6.5" />
+    </template>
     <template v-else-if="name === 'chevron-down'">
       <path d="m6 9 6 6 6-6" />
     </template>
