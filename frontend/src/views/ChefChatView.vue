@@ -37,7 +37,8 @@ let nextId = 1
 let cookingTimer = null
 
 const selectedItems = computed(() => pantry.items.filter((item) => selectedIds.value.includes(item.id)))
-const canSend = computed(() => !loading.value && (input.value.trim().length > 0 || selectedIds.value.length > 0))
+const locked = computed(() => !auth.isVerified)
+const canSend = computed(() => !locked.value && !loading.value && (input.value.trim().length > 0 || selectedIds.value.length > 0))
 
 function push(message) {
   messages.value.push({ id: nextId++, ...message })
@@ -49,7 +50,11 @@ function chefSays(text, extra = {}) {
 }
 
 onMounted(async () => {
-  chefSays(`Olá, ${auth.firstName || 'chef'}! 👨‍🍳 Eu sou o Chef Magic. Quais ingredientes você tem aí? Pode digitar ou carregar da sua geladeira e armário.`)
+  chefSays(
+    locked.value
+      ? `Olá, ${auth.firstName || 'chef'}! 👨‍🍳 Antes de cozinhar, confirme seu e-mail pelo link que enviei para ${auth.user?.email}. Assim que confirmar, é só voltar aqui!`
+      : `Olá, ${auth.firstName || 'chef'}! 👨‍🍳 Eu sou o Chef Magic. Quais ingredientes você tem aí? Pode digitar ou carregar da sua geladeira e armário.`
+  )
   setTimeout(() => {
     if (mood.value === 'wave') mood.value = 'idle'
   }, 2500)
@@ -153,7 +158,7 @@ function onKeydown(event) {
         </div>
       </div>
 
-      <div v-if="messages.length <= 1 && !loading" class="suggestions">
+      <div v-if="messages.length <= 1 && !loading && !locked" class="suggestions">
         <button v-for="suggestion in SUGGESTIONS" :key="suggestion" class="chip suggestion" @click="useSuggestion(suggestion)">
           {{ suggestion }}
         </button>
@@ -165,7 +170,12 @@ function onKeydown(event) {
         </div>
       </Transition>
 
-      <footer class="composer">
+      <div v-if="locked" class="locked">
+        <span>🔒</span>
+        <p>O Chef está esperando a confirmação do seu e-mail. Use o aviso no topo da página para reenviar o link.</p>
+      </div>
+
+      <footer v-else class="composer">
         <div v-if="selectedItems.length" class="selected">
           <span v-for="item in selectedItems" :key="item.id" class="chip amber">
             {{ categoryOf(item.category).emoji }} {{ item.name }}
@@ -357,6 +367,21 @@ function onKeydown(event) {
   color: var(--text);
   border-color: var(--border-strong);
   transform: translateY(-1px);
+}
+.locked {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 16px 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: rgba(255, 179, 71, 0.08);
+  border: 1px dashed rgba(255, 179, 71, 0.4);
+  color: var(--text-soft);
+  font-size: 14px;
+}
+.locked p {
+  margin: 0;
 }
 .picker-panel {
   max-height: 240px;
