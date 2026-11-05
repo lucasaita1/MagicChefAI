@@ -1,5 +1,7 @@
 package dev.lucas.magicchef.config;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -24,5 +26,17 @@ class MailPropertiesTest {
 
         assertThat(properties.from()).isEqualTo("chef@magicchef.dev");
         assertThat(properties.resendEnabled()).isFalse();
+    }
+
+    @Test
+    void rejectsAppBaseUrlWithoutHost() {
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
+        MailProperties broken = new MailProperties("re", "a@b.com", "https://", Duration.ofHours(1));
+        MailProperties valid = new MailProperties("re", "a@b.com", "https://web-production-dc4259.up.railway.app",
+                Duration.ofHours(1));
+
+        assertThat(validator.validate(broken)).extracting(v -> v.getPropertyPath().toString()).containsExactly("appBaseUrl");
+        assertThat(validator.validate(valid)).isEmpty();
     }
 }
