@@ -14,13 +14,15 @@
 
 **Testes: JUnit 5 + Mockito + MockMvc + H2 / Vitest.** Os testes de integração sobem a aplicação inteira com H2 em modo PostgreSQL, rodando as mesmas migrations do Flyway. A IA é sempre mockada, então os testes são rápidos, gratuitos e determinísticos.
 
-**Deploy: Render (API em Docker + Postgres) e Vercel (front).** O Vercel faz proxy de `/api` para o Render, então para o navegador tudo é a mesma origem. Isso permite usar cookie `SameSite=Strict` sem dor de cabeça com CORS e cookies de terceiros.
+**Deploy: Railway, com cada peça na sua máquina.** O Postgres 16, a API e o front rodam como três serviços separados. Só o front (um nginx que serve o Vue e faz proxy de `/api`) tem domínio público; a API e o banco ficam acessíveis apenas pela rede privada. Para o navegador tudo é a mesma origem, o que permite usar cookie `SameSite=Strict`, e ainda dá ao gateway o papel de informar o IP real do cliente para o rate limit.
+
+**E-mail: Resend.** Para impedir que contas falsas consumam a cota da IA, o cadastro envia um link de confirmação pelo Resend (API HTTP simples, com plano gratuito). O envio também fica atrás de uma interface (`EmailSender`), mockada nos testes.
 
 ## Maior dificuldade
 
 A parte mais difícil foi a **proteção contra prompt injection**. Não existe uma regex mágica: alguém sempre pode escrever o ataque de outro jeito. A solução foi pensar em camadas. Primeiro saneio e bloqueio o óbvio antes de chamar a IA (o que também economiza dinheiro), depois isolo o texto do usuário com delimitadores que ele não consegue fechar, deixo a IA recusar com `offTopic` e, por último, valido a saída, incluindo um "canário" secreto no prompt de sistema que, se aparecer na resposta, faz o sistema descartá-la.
 
-Também tive dificuldades práticas: o Spring AI 2.0 chama `getOptions()` no modelo e o meu mock devolvia `null`, quebrando o teste; um Postgres instalado via Homebrew na minha máquina ocupava a porta 5432 e "roubava" as conexões do container (resolvi expondo o Docker na 5433); e descobri durante os testes reais que a conta da OpenAI estava sem créditos. O código já tratava esse erro e mostrava uma mensagem amigável, sem vazar detalhes.
+Também tive dificuldades práticas: o Spring AI 2.0 chama `getOptions()` no modelo e o meu mock devolvia `null`, quebrando o teste; um Postgres instalado via Homebrew na minha máquina ocupava a porta 5432 e "roubava" as conexões do container (resolvi expondo o Docker na 5433); e descobri durante os testes reais que a conta da OpenAI estava sem créditos. Na hora de preparar o deploy, os testes de ponta a ponta pelo gateway pegaram um bug que só apareceria em produção: o navegador manda o cabeçalho `Origin` com o domínio público, mas a API recebe a requisição pela rede privada, então o CORS do Spring a rejeitava. A solução foi declarar explicitamente o domínio do gateway como origem permitida. O código já tratava esse erro e mostrava uma mensagem amigável, sem vazar detalhes.
 
 ## O que aprendi
 
