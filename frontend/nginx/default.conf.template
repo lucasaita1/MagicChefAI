@@ -28,6 +28,12 @@ server {
 
     include /etc/nginx/snippets/security-headers.conf;
 
+    # TEMPORARY: inspect which client-IP headers the platform edge sets (removed after use)
+    location = /__ipdebug {
+        default_type text/plain;
+        return 200 "remote=$remote_addr\nxff=$http_x_forwarded_for\nx_real_ip=$http_x_real_ip\nx_envoy_external=$http_x_envoy_external_address\ncf=$http_cf_connecting_ip\ntrue_client=$http_true_client_ip\nfastly=$http_fastly_client_ip\nforwarded=$http_forwarded\nx_client_ip=$http_x_client_ip\nx_railway_request_id=$http_x_railway_request_id\n";
+    }
+
     location = /healthz {
         access_log off;
         return 200 "ok";
