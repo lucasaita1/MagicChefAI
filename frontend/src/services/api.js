@@ -1,11 +1,12 @@
 const BASE_URL = import.meta.env.VITE_API_URL ?? '/api'
 
 export class ApiError extends Error {
-  constructor(status, message, fieldErrors = {}) {
+  constructor(status, message, fieldErrors = {}, code = null) {
     super(message)
     this.name = 'ApiError'
     this.status = status
     this.fieldErrors = fieldErrors
+    this.code = code
   }
 }
 
@@ -50,7 +51,7 @@ export async function request(path, { method = 'GET', body, skipAuthRedirect = f
   if (!response.ok) {
     if (response.status === 401 && !skipAuthRedirect) unauthorizedHandler()
     const message = data?.detail || FALLBACK_MESSAGES[response.status] || FALLBACK_MESSAGES[500]
-    throw new ApiError(response.status, message, data?.errors ?? {})
+    throw new ApiError(response.status, message, data?.errors ?? {}, data?.code ?? null)
   }
   return data
 }
@@ -60,6 +61,8 @@ export const api = {
   login: (payload) => request('/auth/login', { method: 'POST', body: payload, skipAuthRedirect: true }),
   logout: () => request('/auth/logout', { method: 'POST', skipAuthRedirect: true }),
   me: () => request('/auth/me'),
+  verifyEmail: (token) => request('/auth/verify-email', { method: 'POST', body: { token }, skipAuthRedirect: true }),
+  resendVerification: () => request('/auth/resend-verification', { method: 'POST' }),
 
   listPantry: () => request('/pantry'),
   createPantryItem: (item) => request('/pantry', { method: 'POST', body: item }),
