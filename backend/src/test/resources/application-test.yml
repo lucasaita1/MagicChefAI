@@ -17,5 +17,12 @@ magicchef:
       ttl: 30m
     cookie:
       secure: false
+    login-ip-attempts-per-minute: 15
+    register-ip-attempts-per-minute: 3
+    # Lets tests simulate different client IPs, like the gateway does in production
+    client-ip-header: X-Real-IP
+  mail:
+    resend-api-key: ""
+    app-base-url: https://magicchef.test
   ai:
     requests-per-minute: 3
