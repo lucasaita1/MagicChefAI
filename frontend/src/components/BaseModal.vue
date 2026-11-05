@@ -1,4 +1,5 @@
 <script setup>
+import AppIcon from '@/components/AppIcon.vue'
 import { onBeforeUnmount, onMounted } from 'vue'
 
 defineProps({
@@ -26,7 +27,7 @@ onBeforeUnmount(() => {
       <div class="modal glass" :class="{ wide }" role="dialog" aria-modal="true" :aria-label="title">
         <header class="modal-head">
           <h3>{{ title }}</h3>
-          <button class="btn btn-ghost btn-icon" aria-label="Fechar" @click="emit('close')">✕</button>
+          <button class="btn btn-ghost btn-icon" aria-label="Fechar" @click="emit('close')"><AppIcon name="x" /></button>
         </header>
         <div class="modal-body">
           <slot />

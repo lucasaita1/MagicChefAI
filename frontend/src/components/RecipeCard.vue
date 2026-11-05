@@ -1,4 +1,5 @@
 <script setup>
+import AppIcon from '@/components/AppIcon.vue'
 import { computed } from 'vue'
 import { difficultyOf } from '@/utils/labels'
 import { formatDate, formatMinutes } from '@/utils/format'
@@ -19,14 +20,14 @@ const difficulty = computed(() => difficultyOf(props.recipe.difficulty))
         :aria-label="recipe.favorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
         @click.stop="emit('favorite', recipe)"
       >
-        {{ recipe.favorite ? '♥' : '♡' }}
+        <AppIcon name="heart" :size="17" :filled="recipe.favorite" />
       </button>
     </div>
     <h3>{{ recipe.title }}</h3>
     <p>{{ recipe.summary }}</p>
     <div class="meta">
-      <span class="chip">⏱ {{ formatMinutes(recipe.prepTimeMinutes) }}</span>
-      <span v-if="recipe.servings" class="chip">🍽 {{ recipe.servings }} {{ recipe.servings > 1 ? 'porções' : 'porção' }}</span>
+      <span class="chip"><AppIcon name="clock" :size="14" /> {{ formatMinutes(recipe.prepTimeMinutes) }}</span>
+      <span v-if="recipe.servings" class="chip"><AppIcon name="utensils" :size="14" /> {{ recipe.servings }} {{ recipe.servings > 1 ? 'porções' : 'porção' }}</span>
       <span v-if="difficulty" class="chip" :class="difficulty.tone">{{ difficulty.label }}</span>
     </div>
   </article>
@@ -77,7 +78,8 @@ const difficulty = computed(() => difficultyOf(props.recipe.difficulty))
   border-radius: 50%;
   background: var(--surface);
   color: var(--text-soft);
-  font-size: 17px;
+  display: grid;
+  place-items: center;
   cursor: pointer;
   transition: transform 0.25s var(--ease-spring), color 0.2s, background 0.2s;
 }

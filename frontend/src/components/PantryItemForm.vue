@@ -1,4 +1,5 @@
 <script setup>
+import AppIcon from '@/components/AppIcon.vue'
 import { reactive, ref } from 'vue'
 import { CATEGORIES, LOCATIONS, UNITS } from '@/utils/labels'
 
@@ -48,7 +49,7 @@ async function save() {
     <div class="location" role="radiogroup" aria-label="Onde fica">
       <label v-for="(meta, key) in LOCATIONS" :key="key" class="loc" :class="{ active: form.location === key }">
         <input v-model="form.location" type="radio" name="location" :value="key" class="sr-only" />
-        <span>{{ meta.emoji }}</span> {{ meta.label }}
+        <AppIcon :name="meta.icon" :size="17" /> {{ meta.label }}
       </label>
     </div>
 
@@ -56,7 +57,7 @@ async function save() {
       <div class="field">
         <label for="item-category">Categoria</label>
         <select id="item-category" v-model="form.category" class="input">
-          <option v-for="(meta, key) in CATEGORIES" :key="key" :value="key">{{ meta.emoji }} {{ meta.label }}</option>
+          <option v-for="(meta, key) in CATEGORIES" :key="key" :value="key">{{ meta.label }}</option>
         </select>
       </div>
       <div class="field">

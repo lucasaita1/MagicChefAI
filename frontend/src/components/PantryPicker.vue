@@ -1,4 +1,5 @@
 <script setup>
+import AppIcon from '@/components/AppIcon.vue'
 import { computed } from 'vue'
 import { LOCATIONS, categoryOf } from '@/utils/labels'
 import { formatQuantity } from '@/utils/format'
@@ -33,7 +34,7 @@ function selectGroup(group) {
     </p>
     <section v-for="group in groups" :key="group.key" class="group">
       <header>
-        <h4>{{ group.emoji }} {{ group.label }}</h4>
+        <h4><AppIcon :name="group.icon" :size="16" /> {{ group.label }}</h4>
         <button type="button" class="link" @click="selectGroup(group)">Selecionar tudo</button>
       </header>
       <div class="items">
@@ -46,7 +47,7 @@ function selectGroup(group) {
           :aria-pressed="selected.includes(item.id)"
           @click="toggle(item.id)"
         >
-          <span>{{ categoryOf(item.category).emoji }}</span>
+          <AppIcon :name="categoryOf(item.category).icon" :size="15" class="cat" />
           <span class="name">{{ item.name }}</span>
           <small>{{ formatQuantity(item.quantity, item.unit) }}</small>
         </button>
@@ -71,7 +72,13 @@ function selectGroup(group) {
   margin-bottom: 8px;
 }
 .group h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 14px;
+}
+.cat {
+  color: var(--saffron);
 }
 .link {
   border: 0;

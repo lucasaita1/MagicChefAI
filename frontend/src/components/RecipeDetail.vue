@@ -1,4 +1,5 @@
 <script setup>
+import AppIcon from '@/components/AppIcon.vue'
 import { computed, ref } from 'vue'
 import { difficultyOf } from '@/utils/labels'
 import { formatMinutes } from '@/utils/format'
@@ -25,8 +26,8 @@ function toggle(index) {
       <h2>{{ recipe.title }}</h2>
       <p v-if="recipe.summary" class="summary">{{ recipe.summary }}</p>
       <div class="meta">
-        <span class="chip">⏱ {{ formatMinutes(recipe.prepTimeMinutes) }}</span>
-        <span v-if="recipe.servings" class="chip">🍽 {{ recipe.servings }} {{ recipe.servings > 1 ? 'porções' : 'porção' }}</span>
+        <span class="chip"><AppIcon name="clock" :size="14" /> {{ formatMinutes(recipe.prepTimeMinutes) }}</span>
+        <span v-if="recipe.servings" class="chip"><AppIcon name="utensils" :size="14" /> {{ recipe.servings }} {{ recipe.servings > 1 ? 'porções' : 'porção' }}</span>
         <span v-if="difficulty" class="chip" :class="difficulty.tone">{{ difficulty.label }}</span>
       </div>
     </header>
@@ -38,16 +39,16 @@ function toggle(index) {
 
     <div class="columns">
       <section>
-        <h4>🧺 Ingredientes</h4>
+        <h4><AppIcon name="basket" /> Ingredientes</h4>
         <ul class="ingredients">
           <li v-for="(item, index) in recipe.ingredients" :key="index" :class="{ done: checked.has(index) }" @click="toggle(index)">
-            <span class="check" aria-hidden="true">{{ checked.has(index) ? '✓' : '' }}</span>
+            <span class="check" aria-hidden="true"><AppIcon v-if="checked.has(index)" name="check" :size="13" /></span>
             {{ item }}
           </li>
         </ul>
       </section>
       <section>
-        <h4>👨‍🍳 Modo de preparo</h4>
+        <h4><AppIcon name="chef-hat" /> Modo de preparo</h4>
         <ol class="steps">
           <li v-for="(step, index) in recipe.steps" :key="index">
             <span class="num">{{ index + 1 }}</span>
@@ -58,7 +59,7 @@ function toggle(index) {
     </div>
 
     <section v-if="recipe.tips?.length" class="tips">
-      <h4>💡 Dicas do Chef</h4>
+      <h4><AppIcon name="lightbulb" /> Dicas do Chef</h4>
       <ul>
         <li v-for="(tip, index) in recipe.tips" :key="index">{{ tip }}</li>
       </ul>
@@ -108,8 +109,14 @@ h2 {
   gap: 18px;
 }
 h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 10px;
   font-size: 15px;
+}
+h4 :deep(svg) {
+  color: var(--saffron);
 }
 ul,
 ol {
