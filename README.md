@@ -225,14 +225,14 @@ O workflow [`ci.yml`](.github/workflows/ci.yml) roda a cada push e PR na `main`:
      DATABASE_PASSWORD=${{Postgres.PGPASSWORD}}
      OPENAI_API_KEY=...            JWT_SECRET=...   (openssl rand -base64 48)
      RESEND_API_KEY=...            MAIL_FROM=MagicChefAI <no-reply@seu-dominio>
-     APP_BASE_URL=https://${{web.RAILWAY_PUBLIC_DOMAIN}}
-     CORS_ALLOWED_ORIGINS=https://${{web.RAILWAY_PUBLIC_DOMAIN}}
+     APP_BASE_URL=https://<domínio público do web>
+     CORS_ALLOWED_ORIGINS=https://<domínio público do web>
      CLIENT_IP_HEADER=X-Real-IP
      ```
 3. **+ Create → GitHub Repo** (mesmo repositório) → serviço `web`:
    - *Root Directory* `/frontend` · *Config file* `/frontend/railway.json`
    - *Variables*: `API_UPSTREAM=http://${{api.RAILWAY_PRIVATE_DOMAIN}}:8080`
-   - *Networking → Generate Domain* (este é o único domínio público)
+   - *Networking → Generate Domain* (este é o único domínio público). Cole esse domínio em `APP_BASE_URL` e `CORS_ALLOWED_ORIGINS` da `api` e faça *Redeploy* (a API se recusa a subir se `APP_BASE_URL` não for uma URL completa)
 4. Em cada serviço da aplicação: *Settings → Wait for CI* ✅
 
 ## 🔑 Variáveis de ambiente
