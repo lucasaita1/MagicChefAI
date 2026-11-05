@@ -82,17 +82,3 @@ jobs:
           name: frontend-coverage
           path: frontend/coverage
 
-  deploy:
-    name: Deploy API (Render)
-    needs: [secrets-scan, backend, frontend]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    env:
-      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-    steps:
-      - name: Trigger Render deploy hook
-        if: env.RENDER_DEPLOY_HOOK_URL != ''
-        run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL" > /dev/null && echo "Deploy triggered"
-      - name: Deploy hook not configured
-        if: env.RENDER_DEPLOY_HOOK_URL == ''
-        run: echo "Set the RENDER_DEPLOY_HOOK_URL secret to enable continuous deployment."
