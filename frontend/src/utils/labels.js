@@ -1,19 +1,19 @@
 export const CATEGORIES = {
-  GRAIN: { label: 'Grãos', emoji: '🌾' },
-  MEAT: { label: 'Carnes', emoji: '🥩' },
-  VEGETABLE: { label: 'Legumes', emoji: '🥕' },
-  DAIRY: { label: 'Laticínios', emoji: '🧀' },
-  BAKERY: { label: 'Padaria', emoji: '🥖' },
-  PROTEIN: { label: 'Proteínas', emoji: '🥚' },
-  GREENS: { label: 'Verduras', emoji: '🥬' },
-  FRUIT: { label: 'Frutas', emoji: '🍋' },
-  PASTA: { label: 'Massas', emoji: '🍝' },
-  SWEETS: { label: 'Doces', emoji: '🍫' },
-  BEVERAGE: { label: 'Bebidas', emoji: '🧃' },
-  SPICE: { label: 'Temperos', emoji: '🧄' },
-  CONDIMENT: { label: 'Condimentos', emoji: '🫙' },
-  FROZEN: { label: 'Congelados', emoji: '🧊' },
-  OTHER: { label: 'Outros', emoji: '🍽️' }
+  GRAIN: { label: 'Grãos', icon: 'wheat' },
+  MEAT: { label: 'Carnes', icon: 'drumstick' },
+  VEGETABLE: { label: 'Legumes', icon: 'carrot' },
+  DAIRY: { label: 'Laticínios', icon: 'milk' },
+  BAKERY: { label: 'Padaria', icon: 'bread' },
+  PROTEIN: { label: 'Proteínas', icon: 'egg' },
+  GREENS: { label: 'Verduras', icon: 'leaf' },
+  FRUIT: { label: 'Frutas', icon: 'apple' },
+  PASTA: { label: 'Massas', icon: 'noodles' },
+  SWEETS: { label: 'Doces', icon: 'candy' },
+  BEVERAGE: { label: 'Bebidas', icon: 'cup' },
+  SPICE: { label: 'Temperos', icon: 'garlic' },
+  CONDIMENT: { label: 'Condimentos', icon: 'jar' },
+  FROZEN: { label: 'Congelados', icon: 'snowflake' },
+  OTHER: { label: 'Outros', icon: 'utensils' }
 }
 
 export const UNITS = {
@@ -26,8 +26,8 @@ export const UNITS = {
 }
 
 export const LOCATIONS = {
-  FRIDGE: { label: 'Minha geladeira', emoji: '🧊' },
-  CUPBOARD: { label: 'Meu armário', emoji: '🗄️' }
+  FRIDGE: { label: 'Minha geladeira', icon: 'fridge' },
+  CUPBOARD: { label: 'Meu armário', icon: 'cupboard' }
 }
 
 export const DIFFICULTIES = {
