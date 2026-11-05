@@ -1,0 +1,15 @@
+#!/bin/sh
+# Sourced by the nginx image entrypoint before the template is rendered.
+# Values pasted into a dashboard often carry spaces, quotes or a trailing ";" or "/",
+# which would break nginx syntax. Clean them up, and refuse to start on anything that is
+# still not a plain http(s)://host[:port] URL so the error is obvious in the logs.
+raw="${API_UPSTREAM:-}"
+clean=$(printf '%s' "$raw" | tr -d ' \t\r\n"'"'"';' | sed 's#/*$##')
+
+if ! printf '%s' "$clean" | grep -Eq '^https?://[A-Za-z0-9.-]+(:[0-9]+)?$'; then
+    echo "API_UPSTREAM must look like http://host:port (received: '$raw'). Check the service variables." >&2
+    exit 1
+fi
+
+export API_UPSTREAM="$clean"
+echo "API gateway upstream: $API_UPSTREAM"

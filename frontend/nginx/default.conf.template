@@ -1,5 +1,6 @@
-# Rendered by the nginx image entrypoint (envsubst): ${PORT}, ${API_UPSTREAM} and
-# ${NGINX_LOCAL_RESOLVERS} come from the environment; nginx variables are left untouched.
+# Rendered by the nginx image entrypoint (envsubst): PORT, API_UPSTREAM and
+# NGINX_LOCAL_RESOLVERS come from the environment; nginx variables are left untouched.
+# API_UPSTREAM is validated first by 05-normalize-upstream.envsh.
 
 # Real client IP = last hop appended to X-Forwarded-For by the platform edge (cannot be
 # forged by the client, who can only prepend values). Falls back to the socket address.
