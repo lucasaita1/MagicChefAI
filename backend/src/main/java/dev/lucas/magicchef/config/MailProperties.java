@@ -2,6 +2,7 @@ package dev.lucas.magicchef.config;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -16,7 +17,10 @@ import java.time.Duration;
 public record MailProperties(
         String resendApiKey,
         @NotBlank String from,
-        @NotBlank String appBaseUrl,
+        @NotBlank
+        @Pattern(regexp = "^https?://[A-Za-z0-9.-]+(:[0-9]+)?(/.*)?$",
+                message = "APP_BASE_URL must be the full public URL of the frontend, e.g. https://my-app.up.railway.app")
+        String appBaseUrl,
         @NotNull Duration verificationTtl
 ) {
 
@@ -24,6 +28,7 @@ public record MailProperties(
         // .env files read as properties keep surrounding quotes, which Resend rejects in "from"
         from = unquote(from);
         resendApiKey = unquote(resendApiKey);
+        appBaseUrl = unquote(appBaseUrl);
     }
 
     public boolean resendEnabled() {
