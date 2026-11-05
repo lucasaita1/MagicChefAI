@@ -20,7 +20,7 @@ public class VerificationEmailTemplate {
                     <tr><td align="center">
                       <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#161230;border:1px solid #2a2452;border-radius:20px;overflow:hidden;">
                         <tr><td style="height:4px;background:linear-gradient(90deg,#ffb347,#ff5e7e);"></td></tr>
-                        <tr><td style="padding:36px 32px 8px;text-align:center;font-size:44px;">🤖👨‍🍳</td></tr>
+                        <tr><td style="padding:36px 32px 4px;text-align:center;font-size:22px;font-weight:bold;letter-spacing:-0.5px;color:#f4f2ff;">Magic<span style="color:#ff8a6b;">Chef</span>AI</td></tr>
                         <tr><td style="padding:0 32px;text-align:center;">
                           <h1 style="margin:12px 0 8px;color:#f4f2ff;font-size:24px;">Confirme seu e-mail, %s!</h1>
                           <p style="margin:0 0 28px;color:#b9b4d6;font-size:15px;line-height:1.6;">
@@ -48,6 +48,6 @@ public class VerificationEmailTemplate {
 
                 O link expira em 24 horas. Se você não criou uma conta no MagicChefAI, ignore este e-mail.
                 """.formatted(name, link);
-        return new EmailMessage(to, "Confirme seu e-mail no MagicChefAI 🍳", html, text);
+        return new EmailMessage(to, "Confirme seu e-mail no MagicChefAI", html, text);
     }
 }
