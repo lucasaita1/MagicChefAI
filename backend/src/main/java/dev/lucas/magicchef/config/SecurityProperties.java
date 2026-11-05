@@ -21,7 +21,10 @@ public record SecurityProperties(
         @Valid @NotNull Jwt jwt,
         @Valid @NotNull Cookie cookie,
         @Valid @NotNull Cors cors,
-        @Positive int loginAttemptsPerMinute
+        @Positive int loginAttemptsPerMinute,
+        @Positive int loginIpAttemptsPerMinute,
+        @Positive int registerIpAttemptsPerMinute,
+        String clientIpHeader
 ) {
 
     public record Jwt(
