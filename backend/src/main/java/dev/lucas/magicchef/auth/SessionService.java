@@ -83,7 +83,8 @@ public class SessionService {
         }
 
         User user = session.getUser();
-        return Optional.of(new AuthenticatedUser(user.getId(), user.getName(), user.getEmail(), session.getId()));
+        return Optional.of(new AuthenticatedUser(user.getId(), user.getName(), user.getEmail(),
+                user.isEmailVerified(), session.getId()));
     }
 
     @Transactional
