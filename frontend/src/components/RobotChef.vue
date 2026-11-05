@@ -2,13 +2,20 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  /** idle | wave | thinking | talking | happy | confused */
+  /** idle | wave | thinking | talking | happy | confused | shy (covers the eyes) */
   mood: { type: String, default: 'idle' },
-  size: { type: Number, default: 220 }
+  size: { type: Number, default: 220 },
+  /** Where the robot looks, from -1 (left/up) to 1 (right/down). Used to follow what the user types. */
+  lookX: { type: Number, default: 0 },
+  lookY: { type: Number, default: 0 }
 })
 
+const clamp = (value) => Math.max(-1, Math.min(1, value))
 const moodClass = computed(() => `is-${props.mood}`)
 const happyEyes = computed(() => props.mood === 'happy' || props.mood === 'wave')
+const closedEyes = computed(() => props.mood === 'shy')
+const gaze = computed(() => ({ transform: `translate(${clamp(props.lookX) * 7}px, ${clamp(props.lookY) * 4}px)` }))
+const headTurn = computed(() => ({ transform: `rotate(${clamp(props.lookX) * 4}deg)` }))
 </script>
 
 <template>
@@ -79,6 +86,7 @@ const happyEyes = computed(() => props.mood === 'happy' || props.mood === 'wave'
       <rect x="86" y="198" width="28" height="4" rx="2" fill="#c9c4e8" />
 
       <!-- Head -->
+      <g class="head-turn" :style="headTurn">
       <g class="head">
         <circle cx="44" cy="112" r="9" fill="#ffd08a" />
         <circle class="ear-led" cx="44" cy="112" r="3.5" fill="#3cf2d0" />
@@ -91,8 +99,12 @@ const happyEyes = computed(() => props.mood === 'happy' || props.mood === 'wave'
         <rect x="58" y="84" width="84" height="50" rx="24" fill="url(#rc-visor)" />
         <rect x="58" y="84" width="84" height="50" rx="24" fill="none" stroke="rgba(60,242,208,.25)" stroke-width="1.5" />
 
-        <g class="eyes" filter="url(#rc-glow)">
-          <template v-if="happyEyes">
+        <g class="eyes" :style="gaze" filter="url(#rc-glow)">
+          <template v-if="closedEyes">
+            <path d="M76 106 Q84 112 92 106" stroke="#3cf2d0" stroke-width="4" fill="none" stroke-linecap="round" />
+            <path d="M108 106 Q116 112 124 106" stroke="#3cf2d0" stroke-width="4" fill="none" stroke-linecap="round" />
+          </template>
+          <template v-else-if="happyEyes">
             <path d="M76 110 Q84 100 92 110" stroke="#3cf2d0" stroke-width="4.5" fill="none" stroke-linecap="round" />
             <path d="M108 110 Q116 100 124 110" stroke="#3cf2d0" stroke-width="4.5" fill="none" stroke-linecap="round" />
           </template>
@@ -102,7 +114,7 @@ const happyEyes = computed(() => props.mood === 'happy' || props.mood === 'wave'
           </template>
         </g>
 
-        <g class="mouth" fill="#3cf2d0" filter="url(#rc-glow)">
+        <g class="mouth" :style="gaze" fill="#3cf2d0" filter="url(#rc-glow)">
           <rect class="bar b1" x="89" y="122" width="3" height="4" rx="1.5" />
           <rect class="bar b2" x="94" y="121" width="3" height="6" rx="1.5" />
           <rect class="bar b3" x="99" y="120" width="3" height="8" rx="1.5" />
@@ -121,6 +133,23 @@ const happyEyes = computed(() => props.mood === 'happy' || props.mood === 'wave'
           <rect x="62" y="40" width="76" height="26" rx="6" fill="#ffffff" />
           <rect x="60" y="56" width="80" height="14" rx="6" fill="#ece9fb" />
           <circle class="gem" cx="100" cy="63" r="3.5" fill="#ff5e7e" filter="url(#rc-glow)" />
+        </g>
+      </g>
+      </g>
+
+      <!-- Hands that cover the eyes when the password is revealed -->
+      <g class="cover-hands">
+        <g class="cover cover-left">
+          <g class="mitt" transform="rotate(-14 86 110)">
+            <rect x="70" y="96" width="32" height="28" rx="13" fill="#f4f2ff" stroke="#c9c4e8" stroke-width="1.5" />
+            <path d="M78 97v9M86 96v10M94 97v9" stroke="#c9c4e8" stroke-width="1.6" stroke-linecap="round" />
+          </g>
+        </g>
+        <g class="cover cover-right">
+          <g class="mitt" transform="rotate(14 114 110)">
+            <rect x="98" y="96" width="32" height="28" rx="13" fill="#f4f2ff" stroke="#c9c4e8" stroke-width="1.5" />
+            <path d="M106 97v9M114 96v10M122 97v9" stroke="#c9c4e8" stroke-width="1.6" stroke-linecap="round" />
+          </g>
         </g>
       </g>
     </g>
@@ -177,6 +206,41 @@ const happyEyes = computed(() => props.mood === 'happy' || props.mood === 'wave'
 }
 .bar {
   transform-origin: center;
+}
+.eyes,
+.mouth {
+  transition: transform 0.25s var(--ease-out);
+}
+.head-turn {
+  transform-origin: 50% 90%;
+  transition: transform 0.35s var(--ease-out);
+}
+.robot .mitt {
+  transform-box: view-box;
+}
+.cover {
+  opacity: 0;
+  transform-origin: center;
+  transition: transform 0.45s var(--ease-spring), opacity 0.2s;
+}
+.cover-left {
+  transform: translate(-48px, 58px) scale(0.6);
+}
+.cover-right {
+  transform: translate(48px, 58px) scale(0.6);
+}
+
+/* Shy: the hands fly from the sides to cover the visor and the arms hide */
+.is-shy .cover {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
+}
+.is-shy .arm {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.is-shy .head-turn {
+  transform: rotate(-6deg) !important;
 }
 
 /* Moods */
