@@ -88,6 +88,18 @@ describe('api service', () => {
     expect(fetch.mock.calls[0][1].headers.Authorization).toBeUndefined()
   })
 
+  it('exposes the error code and the verification endpoints', async () => {
+    fetch.mockReturnValue(respond(403, { detail: 'Confirme', code: 'EMAIL_NOT_VERIFIED' }))
+    const error = await api.generateRecipe({}).catch((e) => e)
+    expect(error.code).toBe('EMAIL_NOT_VERIFIED')
+
+    fetch.mockReturnValue(respond(200, { id: 1 }))
+    await api.verifyEmail('abc')
+    await api.resendVerification()
+    expect(JSON.parse(fetch.mock.calls[1][1].body)).toEqual({ token: 'abc' })
+    expect(fetch.mock.calls.slice(1).map(([url]) => url)).toEqual(['/api/auth/verify-email', '/api/auth/resend-verification'])
+  })
+
   it('exposes every endpoint', async () => {
     fetch.mockReturnValue(respond(200, {}))
     await api.register({})

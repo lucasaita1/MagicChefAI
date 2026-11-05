@@ -6,6 +6,9 @@ vi.mock('@/services/api', () => ({
     login: vi.fn(),
     register: vi.fn(),
     logout: vi.fn(),
+    me: vi.fn(),
+    verifyEmail: vi.fn(),
+    resendVerification: vi.fn(),
     listPantry: vi.fn(),
     createPantryItem: vi.fn(),
     updatePantryItem: vi.fn(),
@@ -22,7 +25,7 @@ const { useAuthStore } = await import('@/stores/auth')
 const { usePantryStore } = await import('@/stores/pantry')
 const { useRecipesStore } = await import('@/stores/recipes')
 
-const SESSION = { token: 'jwt', user: { id: 1, name: 'Lucas Aita', email: 'l@mail.com' }, expiresAt: '2999-01-01T00:00:00Z' }
+const SESSION = { token: 'jwt', user: { id: 1, name: 'Lucas Aita', email: 'l@mail.com', emailVerified: true }, expiresAt: '2999-01-01T00:00:00Z' }
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -135,5 +138,39 @@ describe('recipes store', () => {
 
     await expect(recipes.load()).rejects.toThrow('boom')
     expect(recipes.loading).toBe(false)
+  })
+})
+
+describe('auth store e-mail verification', () => {
+  it('refreshes the user and confirms the e-mail', async () => {
+    api.login.mockResolvedValue({ ...SESSION, user: { ...SESSION.user, emailVerified: false } })
+    const auth = useAuthStore()
+    await auth.login({})
+    expect(auth.isVerified).toBe(false)
+
+    api.verifyEmail.mockResolvedValue({ ...SESSION.user, emailVerified: true })
+    await auth.verifyEmail('tok')
+    expect(api.verifyEmail).toHaveBeenCalledWith('tok')
+    expect(auth.isVerified).toBe(true)
+    expect(JSON.parse(sessionStorage.getItem('mc_session')).user.emailVerified).toBe(true)
+
+    api.me.mockResolvedValue({ ...SESSION.user, name: 'Lucas Novo' })
+    await auth.refreshUser()
+    expect(auth.firstName).toBe('Lucas')
+    expect(auth.user.name).toBe('Lucas Novo')
+
+    api.resendVerification.mockResolvedValue(null)
+    await auth.resendVerification()
+    expect(api.resendVerification).toHaveBeenCalled()
+  })
+
+  it('does not touch another logged user when verifying a foreign link, nor refresh without a token', async () => {
+    const auth = useAuthStore()
+    await auth.refreshUser()
+    expect(api.me).not.toHaveBeenCalled()
+
+    api.verifyEmail.mockResolvedValue({ id: 99, emailVerified: true })
+    await auth.verifyEmail('tok')
+    expect(auth.user).toBeNull()
   })
 })

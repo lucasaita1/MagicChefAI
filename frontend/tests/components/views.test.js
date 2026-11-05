@@ -7,6 +7,9 @@ vi.mock('@/services/api', () => ({
     login: vi.fn(),
     register: vi.fn(),
     logout: vi.fn(),
+    me: vi.fn(),
+    verifyEmail: vi.fn(),
+    resendVerification: vi.fn(),
     listPantry: vi.fn(),
     createPantryItem: vi.fn(),
     updatePantryItem: vi.fn(),
@@ -27,7 +30,7 @@ const PantryView = (await import('@/views/PantryView.vue')).default
 const AppHeader = (await import('@/components/AppHeader.vue')).default
 const App = (await import('@/App.vue')).default
 
-const SESSION = { token: 'jwt', user: { id: 1, name: 'Lucas Aita', email: 'l@mail.com' }, expiresAt: '2999-01-01T00:00:00Z' }
+const SESSION = { token: 'jwt', user: { id: 1, name: 'Lucas Aita', email: 'l@mail.com', emailVerified: true }, expiresAt: '2999-01-01T00:00:00Z' }
 
 async function mountView(component, path = '/') {
   const pinia = setupPinia()
