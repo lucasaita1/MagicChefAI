@@ -57,7 +57,7 @@ flowchart LR
 
 - O navegador fala **só com um domínio**, então o cookie `SameSite=Strict` funciona e não há CORS entre sites
 - A API e o banco **não têm IP público**: o único caminho até eles é o gateway
-- O nginx calcula o **IP real do cliente** (último hop do `X-Forwarded-For`, adicionado pela borda do Railway) e repassa em `X-Real-IP`. Como a API só é alcançável pelo gateway, ela pode confiar nesse header para o rate limit
+- O nginx repassa o **IP real do cliente** em `X-Real-IP`: no Railway, a borda da plataforma **reescreve** esse cabeçalho com o IP verdadeiro (valores forjados pelo cliente são descartados); localmente, sem borda, usa o IP do socket (`CLIENT_IP_SOURCE`). Como a API só é alcançável pelo gateway, ela pode confiar nesse header para o rate limit
 
 **Pipeline de geração de receita** (`POST /api/recipes/generate`):
 
@@ -89,7 +89,7 @@ flowchart LR
 | Token usado após logout | Cada JWT tem `jti` ligado a uma linha em `user_sessions`. O logout revoga a sessão e o token morre na hora |
 | **Token roubado (XSS, log, rede)** | Padrão OWASP *token sidejacking*: o JWT carrega apenas o SHA-256 de um valor aleatório que fica num cookie **HttpOnly + Secure + SameSite=Strict**. Sem o cookie, o token é inútil, e o uso indevido **queima a sessão** |
 | Força bruta / credential stuffing | Rate limit **por IP** (20/min no login, 5/min no cadastro) + **por IP e conta** (10/min), BCrypt e mensagem genérica (`E-mail ou senha inválidos.`) |
-| IP falsificado para driblar o limite | A API ignora headers enviados pelo cliente; só confia no `X-Real-IP` que o gateway define a partir da borda do Railway |
+| IP falsificado para driblar o limite | A API só confia no `X-Real-IP` definido pelo gateway, que vem da borda do Railway (que descarta valores forjados). Validado em produção com 21 logins forjados → 429 |
 | Enumeração de dados | Toda consulta é filtrada pelo dono; o recurso de outro usuário retorna 404 |
 
 ### Prompt injection: defesa em camadas
@@ -250,6 +250,7 @@ O workflow [`ci.yml`](.github/workflows/ci.yml) roda a cada push e PR na `main`:
 | `CLIENT_IP_HEADER` | Header com o IP real definido pelo gateway (`X-Real-IP`) |
 | `AI_RATE_LIMIT` / `LOGIN_RATE_LIMIT` / `LOGIN_IP_RATE_LIMIT` / `REGISTER_IP_RATE_LIMIT` | Limites por minuto |
 | `API_UPSTREAM` *(web)* | Endereço privado da API para o gateway nginx |
+| `CLIENT_IP_SOURCE` *(web)* | `edge` (padrão, Railway) ou `socket` (sem proxy na frente) |
 
 ## 📄 Licença
 
