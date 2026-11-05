@@ -33,7 +33,7 @@ public class RecipeController {
     @PostMapping("/generate")
     public ResponseEntity<RecipeResponse> generate(@AuthenticationPrincipal AuthenticatedUser user,
                                                    @Valid @RequestBody GenerateRecipeRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(recipeService.generate(user.id(), request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(recipeService.generate(user, request));
     }
 
     @Operation(summary = "Minhas receitas (mais recentes primeiro)")

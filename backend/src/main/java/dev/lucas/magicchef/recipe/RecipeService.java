@@ -15,7 +15,9 @@ import dev.lucas.magicchef.pantry.PantryItem;
 import dev.lucas.magicchef.pantry.PantryService;
 import dev.lucas.magicchef.recipe.dto.GenerateRecipeRequest;
 import dev.lucas.magicchef.recipe.dto.RecipeResponse;
+import dev.lucas.magicchef.security.AuthenticatedUser;
 import dev.lucas.magicchef.user.UserRepository;
+import dev.lucas.magicchef.verification.EmailNotVerifiedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,11 +44,15 @@ public class RecipeService {
     private final AiProperties aiProperties;
 
     /**
-     * Full generation pipeline: rate limit, sanitize, detect injection, build a delimited
+     * Full generation pipeline: verified e-mail, rate limit, sanitize, detect injection, build a delimited
      * prompt, call the AI and validate its structured answer before persisting it.
      */
     @Transactional
-    public RecipeResponse generate(Long userId, GenerateRecipeRequest request) {
+    public RecipeResponse generate(AuthenticatedUser user, GenerateRecipeRequest request) {
+        if (!user.emailVerified()) {
+            throw new EmailNotVerifiedException();
+        }
+        Long userId = user.id();
         rateLimiter.acquire("ai:" + userId, aiProperties.requestsPerMinute(),
                 "O Chef Magic está com muitas panelas no fogo! Aguarde um minuto para pedir outra receita.");
 
