@@ -1,4 +1,5 @@
 <script setup>
+import AppIcon from '@/components/AppIcon.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePantryStore } from '@/stores/pantry'
@@ -84,9 +85,9 @@ function cook() {
     <div class="columns">
       <section v-for="column in columns" :key="column.key" class="column glass" :class="column.key.toLowerCase()">
         <header class="column-head">
-          <h2><span class="emoji">{{ column.emoji }}</span> {{ column.label }}</h2>
+          <h2><AppIcon :name="column.icon" :size="20" class="col-icon" /> {{ column.label }}</h2>
           <span class="count">{{ column.items.length }}</span>
-          <button class="btn add" @click="openCreate(column.key)">＋ Adicionar</button>
+          <button class="btn add" @click="openCreate(column.key)"><AppIcon name="plus" :size="16" /> Adicionar</button>
         </header>
 
         <TransitionGroup v-if="column.items.length" name="fade-up" tag="ul" class="items">
@@ -100,15 +101,15 @@ function cook() {
             @click="toggle(item.id)"
             @keydown.enter="toggle(item.id)"
           >
-            <span class="cat">{{ categoryOf(item.category).emoji }}</span>
+            <span class="cat"><AppIcon :name="categoryOf(item.category).icon" :size="20" /></span>
             <div class="info">
               <strong>{{ item.name }}</strong>
               <small>{{ formatQuantity(item.quantity, item.unit) }} · {{ categoryOf(item.category).label }}</small>
             </div>
             <span v-if="expiry(item)" class="chip" :class="expiry(item).tone">{{ expiry(item).label }}</span>
             <div class="item-actions">
-              <button class="btn btn-ghost btn-icon" :aria-label="`Editar ${item.name}`" @click.stop="openEdit(item)">✎</button>
-              <button class="btn btn-ghost btn-icon btn-danger" :aria-label="`Remover ${item.name}`" @click.stop="remove(item)">🗑</button>
+              <button class="btn btn-ghost btn-icon" :aria-label="`Editar ${item.name}`" @click.stop="openEdit(item)"><AppIcon name="edit" :size="16" /></button>
+              <button class="btn btn-ghost btn-icon btn-danger" :aria-label="`Remover ${item.name}`" @click.stop="remove(item)"><AppIcon name="trash" :size="16" /></button>
             </div>
           </li>
         </TransitionGroup>
@@ -123,7 +124,7 @@ function cook() {
       <div v-if="selected.length" class="cook-bar glass">
         <span><strong>{{ selected.length }}</strong> {{ selected.length > 1 ? 'itens selecionados' : 'item selecionado' }}</span>
         <button class="btn btn-ghost" @click="selected = []">Limpar</button>
-        <button class="btn btn-primary" @click="cook">👨‍🍳 Cozinhar com o Chef</button>
+        <button class="btn btn-primary" @click="cook"><AppIcon name="chef-hat" :size="17" /> Cozinhar com o Chef</button>
       </div>
     </Transition>
 
@@ -177,7 +178,16 @@ function cook() {
   margin-bottom: 16px;
 }
 .column-head h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 18px;
+}
+.fridge .col-icon {
+  color: var(--mint);
+}
+.cupboard .col-icon {
+  color: var(--saffron);
 }
 .count {
   padding: 2px 9px;
@@ -225,7 +235,7 @@ function cook() {
   height: 40px;
   border-radius: 12px;
   background: var(--surface-strong);
-  font-size: 20px;
+  color: var(--saffron);
 }
 .info {
   display: grid;

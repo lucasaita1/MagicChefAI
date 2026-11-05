@@ -1,4 +1,5 @@
 <script setup>
+import AppIcon from '@/components/AppIcon.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRecipesStore } from '@/stores/recipes'
@@ -49,14 +50,14 @@ async function remove(recipe) {
     <section class="welcome glass">
       <div class="welcome-text">
         <span class="eyebrow">Sua cozinha inteligente</span>
-        <h1>Olá, {{ auth.firstName }}! <span class="wave">👋</span></h1>
+        <h1>Olá, <span class="gradient-text">{{ auth.firstName }}</span>!</h1>
         <p>O que vamos cozinhar hoje? Conte seus ingredientes e o Chef Magic cria a receita.</p>
         <div class="stats">
           <div><strong>{{ recipes.items.length }}</strong><span>receitas</span></div>
           <div><strong>{{ recipes.favorites.length }}</strong><span>favoritas</span></div>
           <div><strong>{{ pantry.items.length }}</strong><span>na despensa</span></div>
         </div>
-        <RouterLink :to="{ name: 'chef' }" class="btn btn-primary big">✨ Pedir outra receita</RouterLink>
+        <RouterLink :to="{ name: 'chef' }" class="btn btn-primary big"><AppIcon name="sparkles" /> Pedir outra receita</RouterLink>
       </div>
       <RobotChef mood="wave" :size="190" class="welcome-bot" />
     </section>
@@ -66,7 +67,7 @@ async function remove(recipe) {
       <div class="controls">
         <div class="segmented" role="tablist">
           <button :class="{ active: filter === 'all' }" role="tab" :aria-selected="filter === 'all'" @click="filter = 'all'">Todas</button>
-          <button :class="{ active: filter === 'favorites' }" role="tab" :aria-selected="filter === 'favorites'" @click="filter = 'favorites'">♥ Favoritas</button>
+          <button :class="{ active: filter === 'favorites' }" role="tab" :aria-selected="filter === 'favorites'" @click="filter = 'favorites'"><AppIcon name="heart" :size="14" /> Favoritas</button>
         </div>
         <input v-model="search" class="input search" type="search" placeholder="Buscar receita..." aria-label="Buscar receita" />
       </div>
@@ -92,8 +93,8 @@ async function remove(recipe) {
     <BaseModal v-if="opened" :title="opened.title" wide @close="opened = null">
       <RecipeDetail :recipe="opened" />
       <div class="modal-actions">
-        <button class="btn" @click="toggleFavorite(opened)">{{ opened.favorite ? '♥ Favorita' : '♡ Favoritar' }}</button>
-        <button class="btn btn-ghost btn-danger" @click="remove(opened)">🗑 Excluir</button>
+        <button class="btn" @click="toggleFavorite(opened)"><AppIcon name="heart" :filled="opened.favorite" :size="16" /> {{ opened.favorite ? 'Favorita' : 'Favoritar' }}</button>
+        <button class="btn btn-ghost btn-danger" @click="remove(opened)"><AppIcon name="trash" :size="16" /> Excluir</button>
       </div>
     </BaseModal>
   </main>
@@ -137,11 +138,6 @@ async function remove(recipe) {
 .welcome p {
   margin: 0;
   color: var(--text-soft);
-}
-.wave {
-  display: inline-block;
-  transform-origin: 70% 70%;
-  animation: hand 2.4s ease-in-out infinite;
 }
 .stats {
   display: flex;
@@ -245,11 +241,6 @@ async function remove(recipe) {
   border-top: 1px solid var(--border);
 }
 
-@keyframes hand {
-  0%, 60%, 100% { transform: rotate(0deg); }
-  10%, 30% { transform: rotate(16deg); }
-  20%, 40% { transform: rotate(-8deg); }
-}
 @keyframes shimmer {
   to { background-position: -200% 0; }
 }

@@ -1,4 +1,5 @@
 <script setup>
+import AppIcon from '@/components/AppIcon.vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -17,7 +18,11 @@ const COOKING_STEPS = [
   'Provando o tempero...',
   'Empratando com carinho...'
 ]
-const SUGGESTIONS = ['🥚 Ovos, queijo e tomate', '🍝 Macarrão, alho e azeite', '🥗 Algo leve com frango e salada']
+const SUGGESTIONS = [
+  { icon: 'egg', text: 'Ovos, queijo e tomate' },
+  { icon: 'noodles', text: 'Macarrão, alho e azeite' },
+  { icon: 'leaf', text: 'Algo leve com frango e salada' }
+]
 const DEFAULT_MESSAGE = 'Quero uma receita com os itens que selecionei da minha despensa.'
 
 const auth = useAuthStore()
@@ -52,8 +57,8 @@ function chefSays(text, extra = {}) {
 onMounted(async () => {
   chefSays(
     locked.value
-      ? `Olá, ${auth.firstName || 'chef'}! 👨‍🍳 Antes de cozinhar, confirme seu e-mail pelo link que enviei para ${auth.user?.email}. Assim que confirmar, é só voltar aqui!`
-      : `Olá, ${auth.firstName || 'chef'}! 👨‍🍳 Eu sou o Chef Magic. Quais ingredientes você tem aí? Pode digitar ou carregar da sua geladeira e armário.`
+      ? `Olá, ${auth.firstName || 'chef'}! Antes de cozinhar, confirme seu e-mail pelo link que enviei para ${auth.user?.email}. Assim que confirmar, é só voltar aqui!`
+      : `Olá, ${auth.firstName || 'chef'}! Eu sou o Chef Magic. Quais ingredientes você tem aí? Pode digitar ou carregar da sua geladeira e armário.`
   )
   setTimeout(() => {
     if (mood.value === 'wave') mood.value = 'idle'
@@ -73,7 +78,7 @@ onMounted(async () => {
 onBeforeUnmount(() => clearInterval(cookingTimer))
 
 function useSuggestion(text) {
-  input.value = text.replace(/^\S+\s/, '')
+  input.value = text
 }
 
 function removeSelected(id) {
@@ -101,7 +106,7 @@ async function send() {
     mood.value = 'happy'
     chefSays(recipe.chefComment || 'Prontinho! Olha só o que eu preparei:')
     push({ from: 'chef', type: 'recipe', recipe })
-    chefSays('Salvei essa receita em “Minhas receitas”. Quer outra? É só me mandar mais ingredientes! 🍳')
+    chefSays('Salvei essa receita em “Minhas receitas”. Quer outra? É só me mandar mais ingredientes!')
   } catch (e) {
     mood.value = 'confused'
     selectedIds.value = ids
@@ -159,8 +164,8 @@ function onKeydown(event) {
       </div>
 
       <div v-if="messages.length <= 1 && !loading && !locked" class="suggestions">
-        <button v-for="suggestion in SUGGESTIONS" :key="suggestion" class="chip suggestion" @click="useSuggestion(suggestion)">
-          {{ suggestion }}
+        <button v-for="suggestion in SUGGESTIONS" :key="suggestion.text" class="chip suggestion" @click="useSuggestion(suggestion.text)">
+          <AppIcon :name="suggestion.icon" :size="14" /> {{ suggestion.text }}
         </button>
       </div>
 
@@ -171,15 +176,15 @@ function onKeydown(event) {
       </Transition>
 
       <div v-if="locked" class="locked">
-        <span>🔒</span>
+        <AppIcon name="lock" :size="20" class="lock-icon" />
         <p>O Chef está esperando a confirmação do seu e-mail. Use o aviso no topo da página para reenviar o link.</p>
       </div>
 
       <footer v-else class="composer">
         <div v-if="selectedItems.length" class="selected">
           <span v-for="item in selectedItems" :key="item.id" class="chip amber">
-            {{ categoryOf(item.category).emoji }} {{ item.name }}
-            <button class="x" :aria-label="`Remover ${item.name}`" @click="removeSelected(item.id)">×</button>
+            <AppIcon :name="categoryOf(item.category).icon" :size="14" /> {{ item.name }}
+            <button class="x" :aria-label="`Remover ${item.name}`" @click="removeSelected(item.id)"><AppIcon name="x" :size="13" /></button>
           </span>
         </div>
         <div class="input-row">
@@ -190,7 +195,7 @@ function onKeydown(event) {
             aria-label="Carregar da geladeira e armário"
             @click="pickerOpen = !pickerOpen"
           >
-            🧊
+            <AppIcon name="fridge" :size="19" />
           </button>
           <textarea
             v-model="input"
@@ -204,7 +209,7 @@ function onKeydown(event) {
           />
           <button class="btn btn-primary send" :disabled="!canSend" aria-label="Enviar" @click="send">
             <span v-if="loading" class="spinner" />
-            <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13" /><path d="m22 2-7 20-4-9-9-4z" /></svg>
+            <AppIcon v-else name="send" />
           </button>
         </div>
         <small class="counter">{{ input.length }}/{{ MAX_LENGTH }}</small>
@@ -219,7 +224,7 @@ function onKeydown(event) {
   grid-template-columns: 280px 1fr;
   gap: 20px;
   padding: 24px 0;
-  height: calc(100vh - 68px);
+  height: calc(100vh - 68px - var(--banner-h, 0px));
   min-height: 560px;
 }
 .side {
@@ -403,7 +408,14 @@ function onKeydown(event) {
   gap: 6px;
   margin-bottom: 10px;
 }
+.lock-icon {
+  flex: none;
+  color: var(--saffron);
+}
 .x {
+  display: grid;
+  place-items: center;
+  padding: 0;
   border: 0;
   background: none;
   color: inherit;
@@ -457,7 +469,7 @@ function onKeydown(event) {
 @media (max-width: 900px) {
   .chat-page {
     grid-template-columns: 1fr;
-    height: calc(100dvh - 68px - 92px);
+    height: calc(100dvh - 68px - 92px - var(--banner-h, 0px));
     padding: 12px 0;
   }
   .side {
