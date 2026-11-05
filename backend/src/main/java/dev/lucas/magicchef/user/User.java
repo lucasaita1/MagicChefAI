@@ -35,10 +35,23 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @Column(name = "email_verified_at")
+    private Instant emailVerifiedAt;
+
     public User(String name, String email, String passwordHash) {
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
         this.createdAt = Instant.now();
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerifiedAt != null;
+    }
+
+    public void markEmailVerified(Instant now) {
+        if (emailVerifiedAt == null) {
+            emailVerifiedAt = now;
+        }
     }
 }
