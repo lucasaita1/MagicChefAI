@@ -6,6 +6,7 @@ export const routes = [
   { path: '/login', name: 'login', component: LoginView, meta: { guestOnly: true, title: 'Entrar' } },
   { path: '/', name: 'recipes', component: () => import('@/views/RecipesView.vue'), meta: { requiresAuth: true, title: 'Minhas receitas' } },
   { path: '/chef', name: 'chef', component: () => import('@/views/ChefChatView.vue'), meta: { requiresAuth: true, title: 'Chef Magic' } },
+  { path: '/verificar-email', name: 'verify-email', component: () => import('@/views/VerifyEmailView.vue'), meta: { title: 'Confirmar e-mail' } },
   { path: '/despensa', name: 'pantry', component: () => import('@/views/PantryView.vue'), meta: { requiresAuth: true, title: 'Geladeira & Armário' } },
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
