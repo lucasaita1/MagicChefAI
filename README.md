@@ -9,7 +9,7 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1-6DB33F)
 ![Spring AI](https://img.shields.io/badge/Spring%20AI-2.0-6DB33F)
 ![Vue](https://img.shields.io/badge/Vue-3.5-42b883)
-![Postgres](https://img.shields.io/badge/Postgres-16-336791)
+![Postgres](https://img.shields.io/badge/Postgres-18-336791)
 ![Railway](https://img.shields.io/badge/deploy-Railway-0B0D0E)
 
 🌐 **Produção:** _a definir após o deploy_ · 🎬 **Vídeo:** _a definir_
@@ -47,7 +47,7 @@ flowchart LR
     subgraph Railway
         W["web · nginx<br/>Vue SPA + gateway /api<br/>(único serviço público)"]
         A["api · Spring Boot 4<br/>Docker · sem domínio público"]
-        P[("Postgres 16<br/>sem domínio público")]
+        P[("Postgres 18<br/>sem domínio público")]
         W -- rede privada --> A
         A -- rede privada --> P
     end
@@ -149,7 +149,7 @@ MagicChefAI/
 │   ├── Dockerfile · railway.json
 │   └── tests/                   # Vitest + Vue Test Utils
 ├── .github/workflows/ci.yml     # CI/CD
-├── docker-compose.yaml          # Postgres 16 local (+ perfil "full" igual à produção)
+├── docker-compose.yaml          # Postgres 18 local (+ perfil "full" igual à produção)
 ├── .env.example
 ├── DECISOES.md
 └── README.md
@@ -161,7 +161,7 @@ MagicChefAI/
 
 ```bash
 cp .env.example .env   # preencha OPENAI_API_KEY e JWT_SECRET
-docker compose up -d   # Postgres 16 na porta 5433
+docker compose up -d   # Postgres 18 na porta 5433
 ```
 
 ```bash

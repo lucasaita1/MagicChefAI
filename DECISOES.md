@@ -6,7 +6,7 @@
 
 **IA: Spring AI 2.0 + OpenAI (gpt-4o-mini).** Antes eu montava o JSON da OpenAI na mão com `WebClient` e lia a chave com uma biblioteca de dotenv dentro do construtor do service. O Spring AI me dá o `ChatClient`, separa mensagens de sistema e de usuário e, principalmente, faz **saída estruturada**: a IA devolve um JSON que vira o record `GeneratedRecipe`. Isso deixou a tela previsível e facilitou validar a resposta. O `gpt-4o-mini` foi escolhido pelo custo baixo e por ser rápido o suficiente para um chat.
 
-**Banco: Postgres 16 + Flyway.** O projeto antigo usava `ddl-auto=update` junto com Flyway, ou seja, duas ferramentas brigando pelo schema. Agora o Flyway é o único dono (migrations V1 a V5, uma por mudança) e o Hibernate só valida (`ddl-auto=validate`). Mantive a V1 original intacta, porque migration já aplicada não se edita, e criei uma nova para substituir a tabela antiga.
+**Banco: Postgres 18 + Flyway.** O projeto antigo usava `ddl-auto=update` junto com Flyway, ou seja, duas ferramentas brigando pelo schema. Agora o Flyway é o único dono (migrations V1 a V6, uma por mudança) e o Hibernate só valida (`ddl-auto=validate`). Mantive a V1 original intacta, porque migration já aplicada não se edita, e criei uma nova para substituir a tabela antiga.
 
 **Segurança: Spring Security + JWT (Nimbus) com sessão revogável.** JWT puro não tem logout de verdade, porque o token continua válido até expirar. Por isso cada token tem um `jti` ligado a uma linha em `user_sessions`, e o logout revoga essa linha. Para o cenário de token roubado, usei o padrão da OWASP de *fingerprint*: o JWT só guarda o hash de um valor que fica num cookie HttpOnly, que o JavaScript não consegue ler.
 
@@ -14,7 +14,7 @@
 
 **Testes: JUnit 5 + Mockito + MockMvc + H2 / Vitest.** Os testes de integração sobem a aplicação inteira com H2 em modo PostgreSQL, rodando as mesmas migrations do Flyway. A IA é sempre mockada, então os testes são rápidos, gratuitos e determinísticos.
 
-**Deploy: Railway, com cada peça na sua máquina.** O Postgres 16, a API e o front rodam como três serviços separados. Só o front (um nginx que serve o Vue e faz proxy de `/api`) tem domínio público; a API e o banco ficam acessíveis apenas pela rede privada. Para o navegador tudo é a mesma origem, o que permite usar cookie `SameSite=Strict`, e ainda dá ao gateway o papel de informar o IP real do cliente para o rate limit.
+**Deploy: Railway, com cada peça na sua máquina.** O Postgres 18, a API e o front rodam como três serviços separados. Só o front (um nginx que serve o Vue e faz proxy de `/api`) tem domínio público; a API e o banco ficam acessíveis apenas pela rede privada. Para o navegador tudo é a mesma origem, o que permite usar cookie `SameSite=Strict`, e ainda dá ao gateway o papel de informar o IP real do cliente para o rate limit.
 
 **E-mail: Resend.** Para impedir que contas falsas consumam a cota da IA, o cadastro envia um link de confirmação pelo Resend (API HTTP simples, com plano gratuito). O envio também fica atrás de uma interface (`EmailSender`), mockada nos testes.
 

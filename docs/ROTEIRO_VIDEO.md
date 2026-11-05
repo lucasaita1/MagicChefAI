@@ -35,6 +35,6 @@ cd backend && ./mvnw verify
 - GitHub → aba **Actions** com todos os jobs verdes → **badge verde no README**.
 
 ## 6:30–8:00 · Decisões
-- **Stack:** Spring Boot 4 + Spring AI (saída estruturada), Postgres 16 + Flyway, Vue 3 + Vite, Railway (gateway nginx público + API e banco privados), Resend para confirmação de e-mail.
+- **Stack:** Spring Boot 4 + Spring AI (saída estruturada), Postgres 18 + Flyway, Vue 3 + Vite, Railway (gateway nginx público + API e banco privados), Resend para confirmação de e-mail.
 - **Maior dificuldade:** prompt injection (defesa em camadas) e invalidar JWT no logout.
 - **O que faria diferente:** Testcontainers, rate limit com Redis, refresh token, streaming da resposta.
