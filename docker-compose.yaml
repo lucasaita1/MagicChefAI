@@ -53,6 +53,8 @@ services:
       - api
     environment:
       API_UPSTREAM: http://api:8080
+      # No edge proxy locally: identify clients by socket address so X-Real-IP cannot be spoofed
+      CLIENT_IP_SOURCE: socket
     ports:
       - "8088:80"
 
