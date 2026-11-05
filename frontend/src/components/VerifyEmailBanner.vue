@@ -1,11 +1,26 @@
 <script setup>
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import AppIcon from './AppIcon.vue'
 
 const auth = useAuthStore()
 const status = ref('idle')
 const message = ref('')
+const root = ref(null)
+let observer = null
+
+// Publishes its height so full-height pages (the chat) can subtract it
+onMounted(() => {
+  if (typeof ResizeObserver === 'undefined' || !root.value) return
+  observer = new ResizeObserver(([entry]) => {
+    document.documentElement.style.setProperty('--banner-h', `${entry.target.offsetHeight}px`)
+  })
+  observer.observe(root.value)
+})
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  document.documentElement.style.removeProperty('--banner-h')
+})
 
 async function resend() {
   status.value = 'sending'
@@ -34,7 +49,7 @@ async function check() {
 </script>
 
 <template>
-  <div class="banner" role="status">
+  <div ref="root" class="banner" role="status">
     <div class="container inner">
       <span class="icon"><AppIcon name="mail" :size="18" /></span>
       <p>
