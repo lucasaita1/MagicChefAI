@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🤖👨‍🍳 MagicChefAI
+<img src="docs/assets/banner.svg" alt="MagicChefAI: chef robô animado, seu chef particular movido a IA generativa" width="100%" />
 
 **Seu chef particular movido a IA generativa.** Cadastre o que tem na geladeira e no armário, converse com o Chef Magic e receba receitas completas em segundos.
 
@@ -12,32 +12,32 @@
 ![Postgres](https://img.shields.io/badge/Postgres-18-336791)
 ![Railway](https://img.shields.io/badge/deploy-Railway-0B0D0E)
 
-🌐 **Produção:** [web-production-dc4259.up.railway.app](https://web-production-dc4259.up.railway.app) · 🎬 **Vídeo:** _a definir_
+**Produção:** [web-production-dc4259.up.railway.app](https://web-production-dc4259.up.railway.app) · **Vídeo:** _a definir_
 
 </div>
 
 ---
 
-## 📌 O problema
+## O problema
 
 Todo mundo já abriu a geladeira e pensou *"o que eu faço com isso?"*. Ingredientes vencem, a criatividade acaba e buscar receita por receita na internet não leva em conta **o que você realmente tem em casa**.
 
-## 💡 Por que IA generativa?
+## Por que IA generativa?
 
 Receitas fixas não se adaptam a combinações arbitrárias de ingredientes, restrições ("sem lactose", "rápido", "vegetariano") e quantidades. Um modelo de linguagem consegue **criar** uma receita nova, coerente e explicada passo a passo para exatamente aquela combinação. O MagicChefAI usa o **ChatGPT (OpenAI)** via **Spring AI** com saída estruturada (JSON Schema), para que a resposta sempre chegue no formato da tela.
 
-## ✨ Funcionalidades
+## Funcionalidades
 
-- 🔐 **Login e cadastro** com JWT + cookie de fingerprint HttpOnly. Logout invalida o token na hora
-- ✉️ **Confirmação de e-mail via Resend**: o Chef só gera receitas depois que o usuário confirma o e-mail (link único, válido por 24h); e-mails descartáveis são recusados
-- 🧊 **Minha geladeira & meu armário**: CRUD de ingredientes com categoria, quantidade, unidade e validade (alerta de vencimento)
-- 💬 **Chat com o Chef Magic**: o chef pergunta os ingredientes, você digita e/ou carrega da despensa, e ele gera a receita
-- 📖 **Minhas receitas**: histórico de tudo que foi gerado, com busca, favoritos e detalhe completo
-- 🛡️ **Proteção contra prompt injection** em 5 camadas: a IA só fala de culinária
-- 🚦 **Rate limit** por IP no login e no cadastro, por conta no login e por usuário na IA
-- 🤖 Interface premium com **chef robô animado em SVG** (acena, pensa, comemora, fica confuso)
+- **Login e cadastro** com JWT + cookie de fingerprint HttpOnly. Logout invalida o token na hora
+- **Confirmação de e-mail via Resend**: o Chef só gera receitas depois que o usuário confirma o e-mail (link único, válido por 24h); e-mails descartáveis são recusados
+- **Minha geladeira & meu armário**: CRUD de ingredientes com categoria, quantidade, unidade e validade (alerta de vencimento)
+- **Chat com o Chef Magic**: o chef pergunta os ingredientes, você digita e/ou carrega da despensa, e ele gera a receita
+- **Minhas receitas**: histórico de tudo que foi gerado, com busca, favoritos e detalhe completo
+- **Proteção contra prompt injection** em 5 camadas: a IA só fala de culinária
+- **Rate limit** por IP no login e no cadastro, por conta no login e por usuário na IA
+- Interface premium com **chef robô animado em SVG** (acena, pensa, comemora, fica confuso)
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 Três serviços isolados no Railway, cada um na sua máquina. Só o gateway é público:
 
@@ -78,7 +78,7 @@ flowchart LR
     VO --> DB[(Salva em Minhas receitas)]
 ```
 
-## 🛡️ Segurança
+## Segurança
 
 ### Autenticação e abuso
 
@@ -102,30 +102,29 @@ flowchart LR
 
 > Chaves de API **nunca** vão para o código: `.env` fica no `.gitignore` e o pipeline roda o **gitleaks** sobre todo o histórico a cada push.
 
-## 🔌 Endpoints
+## Endpoints
 
 Documentação interativa: `http://localhost:8080/swagger-ui.html`
 
 | Método | Rota | Auth | Descrição |
 |---|---|:---:|---|
-| `GET` | `/api/health` | – | **Saúde** da API e do banco |
-| `POST` | `/api/auth/register` | – | Cria conta, envia o e-mail de confirmação e inicia a sessão |
-| `POST` | `/api/auth/login` | – | Login (JWT + cookie de fingerprint) |
-| `POST` | `/api/auth/verify-email` | – | Confirma o e-mail com o token do link |
-| `POST` | `/api/auth/resend-verification` | ✅ | Reenvia o e-mail de confirmação (1/min) |
-| `POST` | `/api/auth/logout` | ✅ | Revoga a sessão imediatamente |
-| `GET` | `/api/auth/me` | ✅ | Usuário autenticado (inclui `emailVerified`) |
-| `POST` | `/api/recipes/generate` | ✅ ✉️ | **Pergunta à IA**: gera receita a partir dos ingredientes |
-| `GET` | `/api/recipes` | ✅ | Minhas receitas |
-| `GET` | `/api/recipes/{id}` | ✅ | Detalhe |
-| `PATCH` | `/api/recipes/{id}/favorite` | ✅ | Favoritar/desfavoritar |
-| `DELETE` | `/api/recipes/{id}` | ✅ | Excluir |
-| `GET` | `/api/pantry?location=FRIDGE\|CUPBOARD` | ✅ | Geladeira/armário |
-| `POST` / `PUT` / `DELETE` | `/api/pantry[/{id}]` | ✅ | CRUD de ingredientes |
+| `GET` | `/api/health` | Pública | **Saúde** da API e do banco |
+| `POST` | `/api/auth/register` | Pública | Cria conta, envia o e-mail de confirmação e inicia a sessão |
+| `POST` | `/api/auth/login` | Pública | Login (JWT + cookie de fingerprint) |
+| `POST` | `/api/auth/verify-email` | Pública | Confirma o e-mail com o token do link |
+| `POST` | `/api/auth/resend-verification` | JWT | Reenvia o e-mail de confirmação (1/min) |
+| `POST` | `/api/auth/logout` | JWT | Revoga a sessão imediatamente |
+| `GET` | `/api/auth/me` | JWT | Usuário autenticado (inclui `emailVerified`) |
+| `POST` | `/api/recipes/generate` | JWT + e-mail confirmado | **Pergunta à IA**: gera receita a partir dos ingredientes |
+| `GET` | `/api/recipes` | JWT | Minhas receitas |
+| `GET` | `/api/recipes/{id}` | JWT | Detalhe |
+| `PATCH` | `/api/recipes/{id}/favorite` | JWT | Favoritar/desfavoritar |
+| `DELETE` | `/api/recipes/{id}` | JWT | Excluir |
+| `GET` | `/api/pantry?location=FRIDGE\|CUPBOARD` | JWT | Geladeira/armário |
+| `POST` / `PUT` / `DELETE` | `/api/pantry[/{id}]` | JWT | CRUD de ingredientes |
 
-✉️ = exige e-mail confirmado
 
-## 📁 Estrutura
+## Estrutura
 
 ```
 MagicChefAI/
@@ -155,7 +154,7 @@ MagicChefAI/
 └── README.md
 ```
 
-## 🚀 Rodando localmente
+## Rodando localmente
 
 **Pré-requisitos:** Java 21, Node 22+, Docker.
 
@@ -180,7 +179,7 @@ Sem `RESEND_API_KEY`, o link de confirmação de e-mail é impresso no log da AP
 docker compose --profile full up --build  # http://localhost:8088
 ```
 
-## 🧪 Testes e cobertura
+## Testes e cobertura
 
 A OpenAI e o Resend são **sempre mockados** nos testes: `RecipeAiClient` e `EmailSender` são `@MockitoBean` nos testes de integração, o `ChatModel` do Spring AI é um mock Mockito, e a API do Resend é simulada com `MockRestServiceServer`. Nenhuma chave real é necessária.
 
@@ -199,7 +198,7 @@ cd frontend && npm run test:coverage   # 64 testes · Vitest (gate de 70%)
 
 Relatórios: `backend/target/site/jacoco/index.html` e `frontend/coverage/index.html`.
 
-## ⚙️ CI/CD
+## CI/CD
 
 O workflow [`ci.yml`](.github/workflows/ci.yml) roda a cada push e PR na `main`:
 
@@ -209,7 +208,7 @@ O workflow [`ci.yml`](.github/workflows/ci.yml) roda a cada push e PR na `main`:
 
 **Deploy contínuo:** o Railway está conectado ao GitHub com *Wait for CI* ligado. Cada push na `main` só é publicado depois que o pipeline fica verde, e cada serviço só é reconstruído quando a sua pasta muda (`watchPatterns`).
 
-## ☁️ Deploy no Railway
+## Deploy no Railway
 
 1. **New Project → Deploy PostgreSQL**. Renomeie o serviço para `Postgres` e confirme a versão 16
 2. **+ Create → GitHub Repo** (este repositório) → serviço `api`:
@@ -233,9 +232,9 @@ O workflow [`ci.yml`](.github/workflows/ci.yml) roda a cada push e PR na `main`:
    - *Root Directory* `/frontend` · *Config file* `/frontend/railway.json`
    - *Variables*: `API_UPSTREAM=http://${{api.RAILWAY_PRIVATE_DOMAIN}}:8080`
    - *Networking → Generate Domain* (este é o único domínio público). Cole esse domínio em `APP_BASE_URL` e `CORS_ALLOWED_ORIGINS` da `api` e faça *Redeploy* (a API se recusa a subir se `APP_BASE_URL` não for uma URL completa)
-4. Em cada serviço da aplicação: *Settings → Wait for CI* ✅
+4. Em cada serviço da aplicação: *Settings → Wait for CI* ligado
 
-## 🔑 Variáveis de ambiente
+## Variáveis de ambiente
 
 | Variável | Descrição |
 |---|---|
@@ -252,6 +251,6 @@ O workflow [`ci.yml`](.github/workflows/ci.yml) roda a cada push e PR na `main`:
 | `API_UPSTREAM` *(web)* | Endereço privado da API para o gateway nginx |
 | `CLIENT_IP_SOURCE` *(web)* | `edge` (padrão, Railway) ou `socket` (sem proxy na frente) |
 
-## 📄 Licença
+## Licença
 
 [MIT](LICENSE) · Feito por **Lucas Aita** para a disciplina da PUCPR.
