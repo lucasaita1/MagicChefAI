@@ -65,6 +65,30 @@ class RecipeIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    void favoritesComeFirstThenNewestFirst() throws Exception {
+        Session session = register();
+        when(aiClient.generate(any())).thenReturn(OMELETTE);
+        Integer first = generate(session);
+        Integer second = generate(session);
+        Integer third = generate(session);
+
+        mvc.perform(session.sign(patch("/api/recipes/" + first + "/favorite"))).andExpect(status().isOk());
+
+        mvc.perform(session.sign(get("/api/recipes")))
+                .andExpect(jsonPath("$[0].id").value(first))
+                .andExpect(jsonPath("$[1].id").value(third))
+                .andExpect(jsonPath("$[2].id").value(second));
+    }
+
+    private Integer generate(Session session) throws Exception {
+        String body = mvc.perform(session.sign(post("/api/recipes/generate")).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"message\": \"Tenho 2 ovos\"}"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        return JsonPath.read(body, "$.id");
+    }
+
+    @Test
     void promptInjectionNeverReachesTheAi() throws Exception {
         Session session = register();
 

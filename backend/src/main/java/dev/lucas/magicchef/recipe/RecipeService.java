@@ -89,7 +89,7 @@ public class RecipeService {
 
     @Transactional(readOnly = true)
     public List<RecipeResponse> list(Long userId) {
-        return recipeRepository.findByUserIdOrderByCreatedAtDesc(userId).stream().map(RecipeResponse::from).toList();
+        return recipeRepository.findByUserIdOrderByFavoriteDescCreatedAtDescIdDesc(userId).stream().map(RecipeResponse::from).toList();
     }
 
     @Transactional(readOnly = true)
