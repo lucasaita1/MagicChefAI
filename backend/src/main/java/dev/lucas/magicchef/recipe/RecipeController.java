@@ -36,7 +36,7 @@ public class RecipeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(recipeService.generate(user, request));
     }
 
-    @Operation(summary = "Minhas receitas (mais recentes primeiro)")
+    @Operation(summary = "Minhas receitas (favoritas primeiro, depois as mais recentes)")
     @GetMapping
     public List<RecipeResponse> list(@AuthenticationPrincipal AuthenticatedUser user) {
         return recipeService.list(user.id());
