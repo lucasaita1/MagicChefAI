@@ -132,6 +132,18 @@ describe('recipes store', () => {
     expect(recipes.items).toEqual([])
   })
 
+  it('lists favorites first while keeping the newest-first order', async () => {
+    api.listRecipes.mockResolvedValue([sampleRecipe({ id: 3 }), sampleRecipe({ id: 2 }), sampleRecipe({ id: 1 })])
+    const recipes = useRecipesStore()
+    await recipes.load(true)
+
+    api.toggleFavorite.mockResolvedValue(sampleRecipe({ id: 1, favorite: true }))
+    await recipes.toggleFavorite(1)
+
+    expect(recipes.sorted.map((recipe) => recipe.id)).toEqual([1, 3, 2])
+    expect(recipes.items.map((recipe) => recipe.id)).toEqual([3, 2, 1])
+  })
+
   it('resets the loading flag when the request fails', async () => {
     api.listRecipes.mockRejectedValue(new Error('boom'))
     const recipes = useRecipesStore()

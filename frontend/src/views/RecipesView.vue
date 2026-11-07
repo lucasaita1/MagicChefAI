@@ -20,7 +20,7 @@ const error = ref('')
 
 const visible = computed(() => {
   const term = search.value.trim().toLowerCase()
-  return (filter.value === 'favorites' ? recipes.favorites : recipes.items).filter(
+  return (filter.value === 'favorites' ? recipes.favorites : recipes.sorted).filter(
     (recipe) => !term || recipe.title.toLowerCase().includes(term) || recipe.summary?.toLowerCase().includes(term)
   )
 })

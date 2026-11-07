@@ -4,6 +4,8 @@ import { api } from '@/services/api'
 export const useRecipesStore = defineStore('recipes', {
   state: () => ({ items: [], loaded: false, loading: false }),
   getters: {
+    // Favorites first; the stable sort keeps the newest-first order inside each group
+    sorted: (state) => [...state.items].sort((a, b) => Number(b.favorite) - Number(a.favorite)),
     favorites: (state) => state.items.filter((recipe) => recipe.favorite)
   },
   actions: {

@@ -168,13 +168,14 @@ describe('RecipesView', () => {
   it('lists, filters, opens, favorites and deletes recipes', async () => {
     login()
     api.listRecipes.mockResolvedValue([sampleRecipe(), sampleRecipe({ id: 2, title: 'Bolo de cenoura', favorite: true })])
-    api.toggleFavorite.mockResolvedValue(sampleRecipe({ favorite: true }))
+    api.toggleFavorite.mockResolvedValue(sampleRecipe({ id: 2, title: 'Bolo de cenoura', favorite: false }))
     api.deleteRecipe.mockResolvedValue(null)
     vi.spyOn(window, 'confirm').mockReturnValue(true)
     const { wrapper } = await mountView(RecipesView)
 
     expect(wrapper.text()).toContain('Olá, Lucas!')
     expect(wrapper.findAll('.card')).toHaveLength(2)
+    expect(wrapper.findAll('.card')[0].text()).toContain('Bolo de cenoura')
 
     await wrapper.findAll('.segmented button')[1].trigger('click')
     expect(wrapper.findAll('.card')).toHaveLength(1)
@@ -189,11 +190,11 @@ describe('RecipesView', () => {
 
     await wrapper.find('.modal-actions .btn').trigger('click')
     await flush()
-    expect(api.toggleFavorite).toHaveBeenCalledWith(1)
+    expect(api.toggleFavorite).toHaveBeenCalledWith(2)
 
     await wrapper.find('.modal-actions .btn-danger').trigger('click')
     await flush()
-    expect(api.deleteRecipe).toHaveBeenCalledWith(1)
+    expect(api.deleteRecipe).toHaveBeenCalledWith(2)
     expect(wrapper.find('.modal').exists()).toBe(false)
   })
 
